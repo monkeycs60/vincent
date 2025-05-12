@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vincendrier
 
-## Getting Started
+Un site fun et sans prise de tête qui affiche les dernières images de Vincent générées par l'IA dans des situations cocasses.
 
-First, run the development server:
+## Concept
+
+Vincendrier est un site qui génère automatiquement des images de Vincent, un développeur senior, en utilisant l'IA. Chaque jour à midi, une nouvelle image est générée avec une punchline sarcastique typique de Vincent.
+
+## Stack Technique
+
+-  **Frontend**: Next.js 15, TailwindCSS, Shadcn UI, Framer Motion
+-  **Backend**: Server Actions Next.js, Prisma
+-  **IA**: Vercel AI SDK, Google AI (modèle Imagen)
+-  **Storage**: Vercel Blob pour les images
+
+## Configuration
+
+### Prérequis
+
+-  Node.js 18.14 ou supérieur
+-  PostgreSQL
+-  Compte Vercel (pour Vercel Blob)
+-  API Key Google pour l'IA
+
+### Étapes d'installation
+
+1. **Cloner le repo**
+
+```bash
+git clone https://github.com/votre-utilisateur/vincendrier.git
+cd vincendrier
+```
+
+2. **Installer les dépendances**
+
+```bash
+npm install
+```
+
+3. **Configurer les variables d'environnement**
+
+Créez un fichier `.env` à la racine du projet avec les variables suivantes:
+
+```
+# Base de données
+DATABASE_URL="postgresql://utilisateur:mot_de_passe@localhost:5432/vincent"
+
+# Vercel Blob storage
+BLOB_READ_WRITE_TOKEN="votre_token_vercel_blob"
+
+# Vercel AI avec Google
+GOOGLE_AI_API_KEY="votre_api_key_google"
+
+# Clé API pour le seeding
+SEED_API_KEY="une_clé_secrète_pour_le_seeding"
+```
+
+4. **Initialiser la base de données**
+
+```bash
+npx prisma db push
+```
+
+5. **Générer les images initiales**
+
+```bash
+curl -X GET http://localhost:3000/api/seed -H "x-api-key: votre_clé_seeding"
+```
+
+6. **Lancer le serveur de développement**
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Configuration pour la Production
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Configuration de Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Créez un projet sur Vercel et connectez-le à votre repository
+2. Configurez une base de données PostgreSQL (Vercel Postgres ou service externe)
+3. Configurez Vercel Blob en suivant la documentation officielle
+4. Ajoutez toutes les variables d'environnement dans les paramètres du projet Vercel
 
-## Learn More
+### Cron Job pour la génération quotidienne
 
-To learn more about Next.js, take a look at the following resources:
+Utilisez Vercel Cron pour appeler l'API de génération d'images chaque jour à midi:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Créez un fichier `vercel.json` à la racine du projet:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```json
+{
+	"crons": [
+		{
+			"path": "/api/cron",
+			"schedule": "0 12 * * *"
+		}
+	]
+}
+```
 
-## Deploy on Vercel
+2. Déployez sur Vercel qui exécutera automatiquement le cron job selon le planning défini.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Licence
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Ce projet est sous licence MIT.
