@@ -15,8 +15,8 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 			<div className='min-h-[70vh] w-full flex flex-col items-center justify-center bg-purple-200 text-center px-4'>
 				<h1 className='text-4xl md:text-6xl font-bold mb-6'>Vincendrier</h1>
 				<p className='text-xl md:text-2xl mb-8 max-w-2xl'>
-					Aucune image de Vincent n'a encore été générée. Revenez plus tard
-					!
+					Aucune image de Vincent n&apos;a encore été générée. Revenez plus
+					tard !
 				</p>
 			</div>
 		);
@@ -72,7 +72,7 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ delay: 0.4, duration: 0.6 }}>
 							<p className='text-xl md:text-2xl font-bold italic text-gray-800 mb-3'>
-								"{latestImage.punchline}"
+								&quot;{latestImage.punchline}&quot;
 							</p>
 							<p className='text-gray-600 text-sm'>
 								Généré le{' '}
@@ -85,7 +85,7 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 							initial={{ opacity: 0, x: -20 }}
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ delay: 0.6, duration: 0.6 }}>
-							Chaque jour à midi, l'IA génère une nouvelle image de
+							Chaque jour à midi, l&apos;IA génère une nouvelle image de
 							Vincent dans des situations cocasses.
 						</motion.p>
 					</div>

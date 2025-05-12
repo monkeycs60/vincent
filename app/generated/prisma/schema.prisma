@@ -27,6 +27,7 @@ model Image {
   url       String
   prompt    String
   punchline String
+  title     String // Titre créatif de l'image
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
