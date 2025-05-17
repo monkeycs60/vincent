@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Image from 'next/image';
 import { Image as ImageType } from '@/app/generated/prisma/index';
@@ -25,7 +27,7 @@ export default function GridGallery({ images }: GridGalleryProps) {
 		return (
 			<div className='flex justify-center items-center h-40 w-full bg-gray-100 rounded-lg'>
 				<p className='text-gray-500 italic'>
-					Pas d'images de Vincent à afficher pour le moment...
+					Pas d&apos;images de Vincent à afficher pour le moment...
 				</p>
 			</div>
 		);
@@ -56,7 +58,7 @@ export default function GridGallery({ images }: GridGalleryProps) {
 							{image.title || 'Vincent du jour'}
 						</p>
 						<p className='text-white font-bold italic text-sm md:text-base'>
-							"{image.punchline}"
+							&quot;{image.punchline}&quot;
 						</p>
 						<p className='text-white/70 text-xs mt-1'>
 							{new Date(image.createdAt).toLocaleDateString()}
