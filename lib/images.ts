@@ -23,7 +23,7 @@ async function generateCreativeTitle() {
 		const { text } = await generateText({
 			model: google('gemini-2.0-flash'),
 			prompt:
-				"Génère un titre créatif pour une image humoristique mettant en scène Vincent dans une situation comique et dans un univers riche (Ghibli, Tintin, Mars, manga etc.). Format: 'Vincent dans [contexte insolite] [situation comique]'. Exemple: 'Vincent dans l'univers de Star Wars débat avec Yoda sur la supériorité du C++'",
+				"Génère un titre créatif pour une image humoristique mettant en scène Vincent dans une situation comique et dans un univers riche (bande dessinée, dessin animé, exoplanète, manga etc.). Format: 'Vincent dans [contexte insolite] [situation comique]'. Exemple: 'Vincent dans l'univers [x] débat avec [y] sur la supériorité du C++'",
 			temperature: 0.8,
 		});
 
