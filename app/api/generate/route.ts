@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
 	try {
 		// Obtenir l'adresse IP pour le log
-		const ip = request.ip || '127.0.0.1';
+		const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
 		console.log(`Requête reçue de l'IP: ${ip}`);
 
 		// Vérifier quand était la dernière génération (juste pour le log)
