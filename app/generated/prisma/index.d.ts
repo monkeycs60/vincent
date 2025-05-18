@@ -2013,6 +2013,7 @@ export namespace Prisma {
     id: number | null
     url: string | null
     title: string | null
+    graphicalStyle: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2021,6 +2022,7 @@ export namespace Prisma {
     id: number | null
     url: string | null
     title: string | null
+    graphicalStyle: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2029,6 +2031,7 @@ export namespace Prisma {
     id: number
     url: number
     title: number
+    graphicalStyle: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2047,6 +2050,7 @@ export namespace Prisma {
     id?: true
     url?: true
     title?: true
+    graphicalStyle?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2055,6 +2059,7 @@ export namespace Prisma {
     id?: true
     url?: true
     title?: true
+    graphicalStyle?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2063,6 +2068,7 @@ export namespace Prisma {
     id?: true
     url?: true
     title?: true
+    graphicalStyle?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2158,6 +2164,7 @@ export namespace Prisma {
     id: number
     url: string
     title: string
+    graphicalStyle: string
     createdAt: Date
     updatedAt: Date
     _count: ImageCountAggregateOutputType | null
@@ -2185,6 +2192,7 @@ export namespace Prisma {
     id?: boolean
     url?: boolean
     title?: boolean
+    graphicalStyle?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["image"]>
@@ -2193,6 +2201,7 @@ export namespace Prisma {
     id?: boolean
     url?: boolean
     title?: boolean
+    graphicalStyle?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["image"]>
@@ -2201,6 +2210,7 @@ export namespace Prisma {
     id?: boolean
     url?: boolean
     title?: boolean
+    graphicalStyle?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["image"]>
@@ -2209,11 +2219,12 @@ export namespace Prisma {
     id?: boolean
     url?: boolean
     title?: boolean
+    graphicalStyle?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ImageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "url" | "title" | "createdAt" | "updatedAt", ExtArgs["result"]["image"]>
+  export type ImageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "url" | "title" | "graphicalStyle" | "createdAt" | "updatedAt", ExtArgs["result"]["image"]>
 
   export type $ImagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Image"
@@ -2222,6 +2233,7 @@ export namespace Prisma {
       id: number
       url: string
       title: string
+      graphicalStyle: string
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["image"]>
@@ -2650,6 +2662,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Image", 'Int'>
     readonly url: FieldRef<"Image", 'String'>
     readonly title: FieldRef<"Image", 'String'>
+    readonly graphicalStyle: FieldRef<"Image", 'String'>
     readonly createdAt: FieldRef<"Image", 'DateTime'>
     readonly updatedAt: FieldRef<"Image", 'DateTime'>
   }
@@ -3047,6 +3060,7 @@ export namespace Prisma {
     id: 'id',
     url: 'url',
     title: 'title',
+    graphicalStyle: 'graphicalStyle',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -3203,6 +3217,7 @@ export namespace Prisma {
     id?: IntFilter<"Image"> | number
     url?: StringFilter<"Image"> | string
     title?: StringFilter<"Image"> | string
+    graphicalStyle?: StringFilter<"Image"> | string
     createdAt?: DateTimeFilter<"Image"> | Date | string
     updatedAt?: DateTimeFilter<"Image"> | Date | string
   }
@@ -3211,6 +3226,7 @@ export namespace Prisma {
     id?: SortOrder
     url?: SortOrder
     title?: SortOrder
+    graphicalStyle?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -3222,6 +3238,7 @@ export namespace Prisma {
     NOT?: ImageWhereInput | ImageWhereInput[]
     url?: StringFilter<"Image"> | string
     title?: StringFilter<"Image"> | string
+    graphicalStyle?: StringFilter<"Image"> | string
     createdAt?: DateTimeFilter<"Image"> | Date | string
     updatedAt?: DateTimeFilter<"Image"> | Date | string
   }, "id">
@@ -3230,6 +3247,7 @@ export namespace Prisma {
     id?: SortOrder
     url?: SortOrder
     title?: SortOrder
+    graphicalStyle?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ImageCountOrderByAggregateInput
@@ -3246,6 +3264,7 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"Image"> | number
     url?: StringWithAggregatesFilter<"Image"> | string
     title?: StringWithAggregatesFilter<"Image"> | string
+    graphicalStyle?: StringWithAggregatesFilter<"Image"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Image"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Image"> | Date | string
   }
@@ -3306,6 +3325,7 @@ export namespace Prisma {
   export type ImageCreateInput = {
     url: string
     title: string
+    graphicalStyle: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -3314,6 +3334,7 @@ export namespace Prisma {
     id?: number
     url: string
     title: string
+    graphicalStyle: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -3321,6 +3342,7 @@ export namespace Prisma {
   export type ImageUpdateInput = {
     url?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    graphicalStyle?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -3329,6 +3351,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    graphicalStyle?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -3337,6 +3360,7 @@ export namespace Prisma {
     id?: number
     url: string
     title: string
+    graphicalStyle: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -3344,6 +3368,7 @@ export namespace Prisma {
   export type ImageUpdateManyMutationInput = {
     url?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    graphicalStyle?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -3352,6 +3377,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    graphicalStyle?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -3515,6 +3541,7 @@ export namespace Prisma {
     id?: SortOrder
     url?: SortOrder
     title?: SortOrder
+    graphicalStyle?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -3527,6 +3554,7 @@ export namespace Prisma {
     id?: SortOrder
     url?: SortOrder
     title?: SortOrder
+    graphicalStyle?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -3535,6 +3563,7 @@ export namespace Prisma {
     id?: SortOrder
     url?: SortOrder
     title?: SortOrder
+    graphicalStyle?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }

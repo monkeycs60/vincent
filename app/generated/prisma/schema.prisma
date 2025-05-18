@@ -23,9 +23,10 @@ model User {
 }
 
 model Image {
-  id        Int      @id @default(autoincrement())
-  url       String
-  title     String // Titre créatif de l'image
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  url            String
+  title          String
+  graphicalStyle String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }

@@ -132,6 +132,7 @@ exports.Prisma.ImageScalarFieldEnum = {
   id: 'id',
   url: 'url',
   title: 'title',
+  graphicalStyle: 'graphicalStyle',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

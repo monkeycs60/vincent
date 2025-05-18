@@ -1,6 +1,6 @@
 import { put } from '@vercel/blob';
 import prisma from './prisma';
-import { generateObject, generateText } from 'ai';
+import { generateObject } from 'ai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { z } from 'zod';
 import OpenAI, { toFile } from 'openai';
@@ -26,43 +26,54 @@ async function generateCreativeTitle() {
 		const existingImages = await prisma.image.findMany({
 			orderBy: { createdAt: 'desc' },
 			take: 50,
-			select: { title: true },
+			select: { title: true, graphicalStyle: true },
 		});
 
 		const existingTitles = existingImages.map((img) => img.title);
 		console.log(
 			`${existingTitles.length} titres précédents récupérés pour analyse`
 		);
+		const existingGraphicStyles = existingImages.map(
+			(img) => img.graphicalStyle
+		);
+		console.log(
+			`${existingGraphicStyles.length} styles graphiques précédents récupérés pour analyse`
+		);
 
 		let prompt = '';
 
-		if (existingTitles.length >= 10) {
-			// Si on a suffisamment de titres existants, on les utilise comme référence
+		if (existingTitles.length >= 1) {
 			prompt = `Voici les derniers titres générés pour des images humoristiques: "${existingTitles.join(
 				'", "'
-			)}"
-			
-			Génère un NOUVEAU titre original d'une dizaine de mots du genre "Vincent dans [univers différent] en train de [faire une action liée au développement]".
+			)} et voici les styles graphiques utilisés précédemment: ${existingGraphicStyles.join(
+				'", "'
+			)}"`;
+
+			prompt += `Génère un seul titre original d'une dizaine de mots à propos de Vincent. Du genre "Vincent dans [univers différent] en train de [faire une action liée au développement]".
 			Le titre doit être complètement différent des précédents et placer Vincent dans un univers qui n'a pas encore été exploré.
-			Vincent est un développeur senior sarcastique qui critique souvent les nouvelles technologies ou les mauvaises pratiques.`;
+			Vincent est un développeur senior qui a tout connu et il est sarcastique et critique souvent les nouvelles technologies ou les mauvaises pratiques, les frameworks à la mode. Ne génère qu'un seul titre.
+			Aussi, tu dois générer un style graphique unique et originale (bande dessinée belge années 50, manga, univers pirate, caricature journal, ce que tu veux) et différent des précédents styles graphiques à chaque fois.`;
 		} else {
-			// Sinon, on donne des instructions plus générales
-			prompt = `Génère un titre original d'une dizaine de mots du genre "Vincent dans [univers différent] en train de [faire une action liée au développement]".
-			Vincent est un vieux dinosaure du développement qui se retrouve dans un univers différent en train de pester sur une problématique de dev.
+			prompt = `Génère un seul titre original d'une dizaine de mots à propos de Vincent. Du genre "Vincent dans [univers différent] en train de [faire une action liée au développement]".
+			Vincent est un développeur senior qui a tout connu et il est sarcastique et critique souvent les nouvelles technologies ou les mauvaises pratiques, les frameworks à la mode. Ne génère qu'un seul titre.
 			Le titre doit placer Vincent dans un contexte insolite (univers de fiction, lieu improbable, époque historique...) 
-			où il fait des réflexions narquoises, énervées ou ironiques sur le monde du développement.`;
+			où il fait un réflexion narquoise, énervée ou ironique sur le monde du développement. Tu dois aussi générer un style graphique unique et originale (bande dessinée belge années 50, manga, univers pirate, caricature journal, ce que tu veux)`;
 		}
 
-		const { text } = await generateText({
+		const result = await generateObject({
 			model: google('gemini-2.0-flash'),
 			prompt,
-			temperature: 0.8,
+			schema: z.object({
+				title: z.string(),
+				graphicalStyle: z.string(),
+			}),
 		});
 
-		const title = text.trim();
+		const title = result.object.title.trim();
+		const graphicalStyle = result.object.graphicalStyle.trim();
 		const duration = Date.now() - startTime;
 		console.log(`Titre généré en ${duration}ms: "${title}"`);
-		return title;
+		return { title, graphicalStyle };
 	} catch (error) {
 		console.error('Erreur lors de la génération du titre:', error);
 		throw error;
@@ -78,12 +89,12 @@ export async function generateVincentImage() {
 
 	try {
 		// Générer un titre créatif
-		const title = await generateCreativeTitle();
+		const { title, graphicalStyle } = await generateCreativeTitle();
 
 		// Préparer le prompt pour la génération d'image
 		const prompt = `Crée une image humoristique illustrant ce titre: "${title}". 
 		L'image doit montrer Vincent, un développeur senior cynique avec lunettes, dans la cinquantaine, vêtu de noir, 
-		dans la situation décrite par le titre. Tu peux trouver une image de référence en pièce-jointe et tu dois t'inspirer de ses traits. Tu dois à chaque fois utiliser un style graphique original.`;
+		dans la situation décrite par le titre et respectant le style graphique suivant: ${graphicalStyle}. Tu peux trouver une image de référence en pièce-jointe et tu dois t'inspirer de ses traits.`;
 
 		// Générer l'image avec le prompt et l'image de référence
 		console.log("Génération de l'image avec OpenAI...");
@@ -116,42 +127,11 @@ export async function generateVincentImage() {
 			prompt,
 		});
 
-		console.log(rsp);
-
-		// const result = await generateObject({
-		// 	model: openai('chatgpt-4o-latest'),
-		// 	schema: VincentImageSchema,
-		// 	messages: [
-		// 		{
-		// 			role: 'user',
-		// 			content: [
-		// 				{ type: 'text', text: prompt },
-		// 				{
-		// 					type: 'image',
-		// 					image: 'https://cd12r53fudbdemeq.public.blob.vercel-storage.com/vincentbiere-SxVL1chxZY90HxsCmIeuVXqtcVIqwT.png',
-		// 				},
-		// 			],
-		// 		},
-		// 	],
-		// });
-
 		console.log(`Image générée en ${Date.now() - imageStartTime}ms`);
 
 		// Enregistrement dans Vercel Blob
 		console.log("Enregistrement de l'image dans Vercel Blob...");
 		const blobStartTime = Date.now();
-
-		console.log('LA DTA ARRIVE', rsp.data?.[0]);
-		console.log('LA DTA ARRIVE', rsp.data?.[0].b64_json);
-
-		// if (
-		// 	!rsp.data ||
-		// 	!rsp.data[0] ||
-		// 	!rsp.data[0].url ||
-		// 	!rsp.data[0].b64_json
-		// ) {
-		// 	throw new Error("Aucune image générée par l'API OpenAI");
-		// }
 
 		const buffer = Buffer.from(rsp.data?.[0]?.b64_json || '', 'base64');
 		const blob = await put(`vincent-${Date.now()}.png`, buffer, {
@@ -171,6 +151,7 @@ export async function generateVincentImage() {
 			data: {
 				url: blob.url,
 				title,
+				graphicalStyle,
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			},
