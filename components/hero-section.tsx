@@ -50,7 +50,7 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 						transition={{ type: 'spring', stiffness: 300 }}>
 						<Image
 							src={latestImage.url}
-							alt={latestImage.prompt}
+							alt={latestImage.title}
 							fill
 							className='object-cover'
 							priority
@@ -74,7 +74,7 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ delay: 0.4, duration: 0.6 }}>
 							<p className='text-xl md:text-2xl font-bold italic text-gray-800 mb-3'>
-								&quot;{latestImage.punchline}&quot;
+								&quot;{latestImage.title}&quot;
 							</p>
 							<p className='text-gray-600 text-sm'>
 								Généré le{' '}

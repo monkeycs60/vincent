@@ -47,7 +47,7 @@ export default function GridGallery({ images }: GridGalleryProps) {
 					<div className='relative aspect-square'>
 						<Image
 							src={image.url}
-							alt={image.prompt}
+							alt={image.title}
 							fill
 							className='object-cover transition-transform duration-500 group-hover:scale-105'
 							sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
@@ -58,7 +58,7 @@ export default function GridGallery({ images }: GridGalleryProps) {
 							{image.title || 'Vincent du jour'}
 						</p>
 						<p className='text-white font-bold italic text-sm md:text-base'>
-							&quot;{image.punchline}&quot;
+							&quot;{image.title}&quot;
 						</p>
 						<p className='text-white/70 text-xs mt-1'>
 							{new Date(image.createdAt).toLocaleDateString()}

@@ -1,35 +1,68 @@
 import { put } from '@vercel/blob';
 import prisma from './prisma';
-import { experimental_generateImage as generateImage, generateText } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
+import { generateObject, generateText } from 'ai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { z } from 'zod';
+import OpenAI, { toFile } from 'openai';
+import { Buffer } from 'buffer';
 
 const google = createGoogleGenerativeAI({
 	apiKey: process.env.GOOGLE_GEMINI_API_KEY,
 });
 
-const openai = createOpenAI({
+const client = new OpenAI({
 	apiKey: process.env.OPEN_AI_API_KEY,
-})
+});
 
 /**
- * Génère un titre créatif pour l'image
+ * Génère un titre créatif pour l'image en se basant sur les titres précédents
  */
 async function generateCreativeTitle() {
 	console.log('Génération du titre créatif...');
 	const startTime = Date.now();
 
 	try {
+		// Récupérer les 50 derniers titres pour analyser les tendances
+		const existingImages = await prisma.image.findMany({
+			orderBy: { createdAt: 'desc' },
+			take: 50,
+			select: { title: true },
+		});
+
+		const existingTitles = existingImages.map((img) => img.title);
+		console.log(
+			`${existingTitles.length} titres précédents récupérés pour analyse`
+		);
+
+		let prompt = '';
+
+		if (existingTitles.length >= 10) {
+			// Si on a suffisamment de titres existants, on les utilise comme référence
+			prompt = `Voici les derniers titres générés pour des images humoristiques: "${existingTitles.join(
+				'", "'
+			)}"
+			
+			Génère un NOUVEAU titre original d'une dizaine de mots du genre "Vincent dans [univers différent] en train de [faire une action liée au développement]".
+			Le titre doit être complètement différent des précédents et placer Vincent dans un univers qui n'a pas encore été exploré.
+			Vincent est un développeur senior sarcastique qui critique souvent les nouvelles technologies ou les mauvaises pratiques.`;
+		} else {
+			// Sinon, on donne des instructions plus générales
+			prompt = `Génère un titre original d'une dizaine de mots du genre "Vincent dans [univers différent] en train de [faire une action liée au développement]".
+			Vincent est un vieux dinosaure du développement qui se retrouve dans un univers différent en train de pester sur une problématique de dev.
+			Le titre doit placer Vincent dans un contexte insolite (univers de fiction, lieu improbable, époque historique...) 
+			où il fait des réflexions narquoises, énervées ou ironiques sur le monde du développement.`;
+		}
+
 		const { text } = await generateText({
 			model: google('gemini-2.0-flash'),
-			prompt:
-				"Génère un titre créatif pour une image humoristique mettant en scène Vincent dans une situation comique et dans un univers riche (bande dessinée, dessin animé, exoplanète, manga etc.). Format: 'Vincent dans [contexte insolite] [situation comique]'. Exemple: 'Vincent dans l'univers [x] débat avec [y] sur la supériorité du C++'",
+			prompt,
 			temperature: 0.8,
 		});
 
+		const title = text.trim();
 		const duration = Date.now() - startTime;
-		console.log(`Titre généré en ${duration}ms: "${text.trim()}"`);
-		return text.trim();
+		console.log(`Titre généré en ${duration}ms: "${title}"`);
+		return title;
 	} catch (error) {
 		console.error('Erreur lors de la génération du titre:', error);
 		throw error;
@@ -37,48 +70,7 @@ async function generateCreativeTitle() {
 }
 
 /**
- * Analyse les styles des images précédentes pour éviter les répétitions
- */
-async function analyzeExistingStyles() {
-	console.log("Analyse des styles d'images précédents...");
-	const startTime = Date.now();
-
-	try {
-		const existingImages = await prisma.image.findMany({
-			orderBy: { createdAt: 'desc' },
-			take: 10,
-			select: { prompt: true },
-		});
-
-		console.log(
-			`${existingImages.length} images précédentes trouvées pour analyse`
-		);
-
-		if (existingImages.length === 0) {
-			console.log('Aucune image précédente trouvée, analyse ignorée');
-			return "Pas d'images précédentes";
-		}
-
-		const { text } = await generateText({
-			model: google('gemini-2.0-flash'),
-			prompt: `Analyse ces prompts d'images: "${existingImages
-				.map((img) => img.prompt)
-				.join(
-					'", "'
-				)}". Identifie les styles artistiques déjà utilisés et suggère 3 styles originaux différents à explorer. Réponds uniquement avec la liste des styles à éviter suivie de la liste des 3 suggestions.`,
-		});
-
-		const duration = Date.now() - startTime;
-		console.log(`Analyse des styles terminée en ${duration}ms`);
-		return text.trim();
-	} catch (error) {
-		console.error("Erreur lors de l'analyse des styles:", error);
-		throw error;
-	}
-}
-
-/**
- * Génère une nouvelle image avec l'IA et l'enregistre dans Vercel Blob
+ * Génère une nouvelle image avec l'IA en utilisant l'image de référence de Vincent
  */
 export async function generateVincentImage() {
 	console.log("Début du processus de génération d'image...");
@@ -88,59 +80,80 @@ export async function generateVincentImage() {
 		// Générer un titre créatif
 		const title = await generateCreativeTitle();
 
-		// Analyser les styles existants et en proposer de nouveaux
-		const styleAnalysis = await analyzeExistingStyles();
+		// Préparer le prompt pour la génération d'image
+		const prompt = `Crée une image humoristique illustrant ce titre: "${title}". 
+		L'image doit montrer Vincent, un développeur senior cynique avec lunettes, dans la cinquantaine, vêtu de noir, 
+		dans la situation décrite par le titre. Tu peux trouver une image de référence en pièce-jointe et tu dois t'inspirer de ses traits. Tu dois à chaque fois utiliser un style graphique original.`;
 
-		// Générer un prompt complet pour l'image
-		console.log('Génération du prompt détaillé...');
-		const promptStartTime = Date.now();
-
-		const { text: fullPrompt } = await generateText({
-			model: google('gemini-2.0-flash'),
-			prompt: `Crée un prompt détaillé pour générer une image humoristique et professionnelle basée sur ce titre: "${title}". 
-			Voici l'analyse des styles précédents: "${styleAnalysis}".
-			Le prompt doit décrire précisément Vincent (un développeur senior avec lunettes, dans la cinquantaine, vêtu de noir) dans une situation qui correspond au titre, avec un style artistique original qui n'est pas dans la liste des styles à éviter.
-			Ne mentionne pas le titre directement dans le prompt, transforme-le en description visuelle.`,
-		});
-
-		console.log(`Prompt généré en ${Date.now() - promptStartTime}ms`);
-		console.log(`Prompt: "${fullPrompt.substring(0, 100)}..."`);
-
-		// Générer une punchline sarcastique pour accompagner l'image
-		console.log('Génération de la punchline...');
-		const punchlineStartTime = Date.now();
-
-		const { text: punchline } = await generateText({
-			model: google('gemini-2.0-flash'),
-			prompt: `Crée une punchline sarcastique courte (max 100 caractères) que Vincent pourrait dire, en lien avec ce titre: "${title}". La punchline doit être cynique, technique et faire référence au monde du développement.`,
-			temperature: 0.7,
-		});
-
-		console.log(
-			`Punchline générée en ${
-				Date.now() - punchlineStartTime
-			}ms: "${punchline}"`
-		);
-
-		// Générer l'image avec le prompt élaboré
+		// Générer l'image avec le prompt et l'image de référence
 		console.log("Génération de l'image avec OpenAI...");
 		const imageStartTime = Date.now();
 
-		const { image } = await generateImage({
-			model: openai.image('gpt-image-1'),
-			prompt: fullPrompt,
-			aspectRatio: '16:9',
+		// Télécharger l'image de référence depuis l'URL
+		const imageUrl =
+			'https://cd12r53fudbdemeq.public.blob.vercel-storage.com/vincentbiere-SxVL1chxZY90HxsCmIeuVXqtcVIqwT.png';
+		console.log(
+			`Téléchargement de l'image de référence depuis ${imageUrl}...`
+		);
+		const response = await fetch(imageUrl);
+
+		if (!response.ok) {
+			throw new Error(
+				`Impossible de télécharger l'image: ${response.status} ${response.statusText}`
+			);
+		}
+
+		const imageBuffer = await response.arrayBuffer();
+		const vincentImageFile = await toFile(
+			new Uint8Array(imageBuffer),
+			'vincent-reference.png',
+			{ type: 'image/png' }
+		);
+
+		const rsp = await client.images.edit({
+			model: 'gpt-image-1',
+			image: vincentImageFile,
+			prompt,
 		});
+
+		console.log(rsp);
+
+		// const result = await generateObject({
+		// 	model: openai('chatgpt-4o-latest'),
+		// 	schema: VincentImageSchema,
+		// 	messages: [
+		// 		{
+		// 			role: 'user',
+		// 			content: [
+		// 				{ type: 'text', text: prompt },
+		// 				{
+		// 					type: 'image',
+		// 					image: 'https://cd12r53fudbdemeq.public.blob.vercel-storage.com/vincentbiere-SxVL1chxZY90HxsCmIeuVXqtcVIqwT.png',
+		// 				},
+		// 			],
+		// 		},
+		// 	],
+		// });
 
 		console.log(`Image générée en ${Date.now() - imageStartTime}ms`);
 
 		// Enregistrement dans Vercel Blob
-		console.log(
-			"Conversion de l'image en Buffer et enregistrement dans Vercel Blob..."
-		);
+		console.log("Enregistrement de l'image dans Vercel Blob...");
 		const blobStartTime = Date.now();
 
-		const buffer = Buffer.from(image.uint8Array);
+		console.log('LA DTA ARRIVE', rsp.data?.[0]);
+		console.log('LA DTA ARRIVE', rsp.data?.[0].b64_json);
+
+		// if (
+		// 	!rsp.data ||
+		// 	!rsp.data[0] ||
+		// 	!rsp.data[0].url ||
+		// 	!rsp.data[0].b64_json
+		// ) {
+		// 	throw new Error("Aucune image générée par l'API OpenAI");
+		// }
+
+		const buffer = Buffer.from(rsp.data?.[0]?.b64_json || '', 'base64');
 		const blob = await put(`vincent-${Date.now()}.png`, buffer, {
 			access: 'public',
 		});
@@ -157,8 +170,6 @@ export async function generateVincentImage() {
 		const newImage = await prisma.image.create({
 			data: {
 				url: blob.url,
-				prompt: fullPrompt,
-				punchline,
 				title,
 				createdAt: new Date(),
 				updatedAt: new Date(),

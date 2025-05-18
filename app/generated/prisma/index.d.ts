@@ -2012,8 +2012,6 @@ export namespace Prisma {
   export type ImageMinAggregateOutputType = {
     id: number | null
     url: string | null
-    prompt: string | null
-    punchline: string | null
     title: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -2022,8 +2020,6 @@ export namespace Prisma {
   export type ImageMaxAggregateOutputType = {
     id: number | null
     url: string | null
-    prompt: string | null
-    punchline: string | null
     title: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -2032,8 +2028,6 @@ export namespace Prisma {
   export type ImageCountAggregateOutputType = {
     id: number
     url: number
-    prompt: number
-    punchline: number
     title: number
     createdAt: number
     updatedAt: number
@@ -2052,8 +2046,6 @@ export namespace Prisma {
   export type ImageMinAggregateInputType = {
     id?: true
     url?: true
-    prompt?: true
-    punchline?: true
     title?: true
     createdAt?: true
     updatedAt?: true
@@ -2062,8 +2054,6 @@ export namespace Prisma {
   export type ImageMaxAggregateInputType = {
     id?: true
     url?: true
-    prompt?: true
-    punchline?: true
     title?: true
     createdAt?: true
     updatedAt?: true
@@ -2072,8 +2062,6 @@ export namespace Prisma {
   export type ImageCountAggregateInputType = {
     id?: true
     url?: true
-    prompt?: true
-    punchline?: true
     title?: true
     createdAt?: true
     updatedAt?: true
@@ -2169,8 +2157,6 @@ export namespace Prisma {
   export type ImageGroupByOutputType = {
     id: number
     url: string
-    prompt: string
-    punchline: string
     title: string
     createdAt: Date
     updatedAt: Date
@@ -2198,8 +2184,6 @@ export namespace Prisma {
   export type ImageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     url?: boolean
-    prompt?: boolean
-    punchline?: boolean
     title?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -2208,8 +2192,6 @@ export namespace Prisma {
   export type ImageSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     url?: boolean
-    prompt?: boolean
-    punchline?: boolean
     title?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -2218,8 +2200,6 @@ export namespace Prisma {
   export type ImageSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     url?: boolean
-    prompt?: boolean
-    punchline?: boolean
     title?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -2228,14 +2208,12 @@ export namespace Prisma {
   export type ImageSelectScalar = {
     id?: boolean
     url?: boolean
-    prompt?: boolean
-    punchline?: boolean
     title?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ImageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "url" | "prompt" | "punchline" | "title" | "createdAt" | "updatedAt", ExtArgs["result"]["image"]>
+  export type ImageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "url" | "title" | "createdAt" | "updatedAt", ExtArgs["result"]["image"]>
 
   export type $ImagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Image"
@@ -2243,8 +2221,6 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: number
       url: string
-      prompt: string
-      punchline: string
       title: string
       createdAt: Date
       updatedAt: Date
@@ -2673,8 +2649,6 @@ export namespace Prisma {
   interface ImageFieldRefs {
     readonly id: FieldRef<"Image", 'Int'>
     readonly url: FieldRef<"Image", 'String'>
-    readonly prompt: FieldRef<"Image", 'String'>
-    readonly punchline: FieldRef<"Image", 'String'>
     readonly title: FieldRef<"Image", 'String'>
     readonly createdAt: FieldRef<"Image", 'DateTime'>
     readonly updatedAt: FieldRef<"Image", 'DateTime'>
@@ -3072,8 +3046,6 @@ export namespace Prisma {
   export const ImageScalarFieldEnum: {
     id: 'id',
     url: 'url',
-    prompt: 'prompt',
-    punchline: 'punchline',
     title: 'title',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -3230,8 +3202,6 @@ export namespace Prisma {
     NOT?: ImageWhereInput | ImageWhereInput[]
     id?: IntFilter<"Image"> | number
     url?: StringFilter<"Image"> | string
-    prompt?: StringFilter<"Image"> | string
-    punchline?: StringFilter<"Image"> | string
     title?: StringFilter<"Image"> | string
     createdAt?: DateTimeFilter<"Image"> | Date | string
     updatedAt?: DateTimeFilter<"Image"> | Date | string
@@ -3240,8 +3210,6 @@ export namespace Prisma {
   export type ImageOrderByWithRelationInput = {
     id?: SortOrder
     url?: SortOrder
-    prompt?: SortOrder
-    punchline?: SortOrder
     title?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -3253,8 +3221,6 @@ export namespace Prisma {
     OR?: ImageWhereInput[]
     NOT?: ImageWhereInput | ImageWhereInput[]
     url?: StringFilter<"Image"> | string
-    prompt?: StringFilter<"Image"> | string
-    punchline?: StringFilter<"Image"> | string
     title?: StringFilter<"Image"> | string
     createdAt?: DateTimeFilter<"Image"> | Date | string
     updatedAt?: DateTimeFilter<"Image"> | Date | string
@@ -3263,8 +3229,6 @@ export namespace Prisma {
   export type ImageOrderByWithAggregationInput = {
     id?: SortOrder
     url?: SortOrder
-    prompt?: SortOrder
-    punchline?: SortOrder
     title?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -3281,8 +3245,6 @@ export namespace Prisma {
     NOT?: ImageScalarWhereWithAggregatesInput | ImageScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Image"> | number
     url?: StringWithAggregatesFilter<"Image"> | string
-    prompt?: StringWithAggregatesFilter<"Image"> | string
-    punchline?: StringWithAggregatesFilter<"Image"> | string
     title?: StringWithAggregatesFilter<"Image"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Image"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Image"> | Date | string
@@ -3343,8 +3305,6 @@ export namespace Prisma {
 
   export type ImageCreateInput = {
     url: string
-    prompt: string
-    punchline: string
     title: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -3353,8 +3313,6 @@ export namespace Prisma {
   export type ImageUncheckedCreateInput = {
     id?: number
     url: string
-    prompt: string
-    punchline: string
     title: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -3362,8 +3320,6 @@ export namespace Prisma {
 
   export type ImageUpdateInput = {
     url?: StringFieldUpdateOperationsInput | string
-    prompt?: StringFieldUpdateOperationsInput | string
-    punchline?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3372,8 +3328,6 @@ export namespace Prisma {
   export type ImageUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
-    prompt?: StringFieldUpdateOperationsInput | string
-    punchline?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3382,8 +3336,6 @@ export namespace Prisma {
   export type ImageCreateManyInput = {
     id?: number
     url: string
-    prompt: string
-    punchline: string
     title: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -3391,8 +3343,6 @@ export namespace Prisma {
 
   export type ImageUpdateManyMutationInput = {
     url?: StringFieldUpdateOperationsInput | string
-    prompt?: StringFieldUpdateOperationsInput | string
-    punchline?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3401,8 +3351,6 @@ export namespace Prisma {
   export type ImageUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
-    prompt?: StringFieldUpdateOperationsInput | string
-    punchline?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3566,8 +3514,6 @@ export namespace Prisma {
   export type ImageCountOrderByAggregateInput = {
     id?: SortOrder
     url?: SortOrder
-    prompt?: SortOrder
-    punchline?: SortOrder
     title?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -3580,8 +3526,6 @@ export namespace Prisma {
   export type ImageMaxOrderByAggregateInput = {
     id?: SortOrder
     url?: SortOrder
-    prompt?: SortOrder
-    punchline?: SortOrder
     title?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -3590,8 +3534,6 @@ export namespace Prisma {
   export type ImageMinOrderByAggregateInput = {
     id?: SortOrder
     url?: SortOrder
-    prompt?: SortOrder
-    punchline?: SortOrder
     title?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
