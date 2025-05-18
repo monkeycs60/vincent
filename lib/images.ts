@@ -1,10 +1,11 @@
 import { put } from '@vercel/blob';
 import prisma from './prisma';
 import { generateObject } from 'ai';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { createGoogleGenerativeAI, GoogleGenerativeAIProviderOptions } from '@ai-sdk/google';
 import { z } from 'zod';
 import OpenAI, { toFile } from 'openai';
 import { Buffer } from 'buffer';
+import sharp from 'sharp';
 
 const google = createGoogleGenerativeAI({
 	apiKey: process.env.GOOGLE_GEMINI_API_KEY,
@@ -52,16 +53,27 @@ async function generateCreativeTitle() {
 			prompt += `Génère un seul titre original d'une dizaine de mots à propos de Vincent. Du genre "Vincent dans [univers différent] en train de [faire une action liée au développement]".
 			Le titre doit être complètement différent des précédents et placer Vincent dans un univers qui n'a pas encore été exploré.
 			Vincent est un développeur senior qui a tout connu et il est sarcastique et critique souvent les nouvelles technologies ou les mauvaises pratiques, les frameworks à la mode. Ne génère qu'un seul titre.
-			Aussi, tu dois générer un style graphique unique et originale (bande dessinée belge années 50, manga, univers pirate, caricature journal, ce que tu veux) et différent des précédents styles graphiques à chaque fois.`;
+			Aussi, tu dois générer un style graphique unique et originale (bande dessinée belge années 50, manga, univers pirate, caricature journal, ce que tu veux), n'enfreignant pas de copyright et ne citant pas de nom d'artistes (utilise plutôt des périphrases) et différent des précédents styles graphiques à chaque fois.`;
 		} else {
 			prompt = `Génère un seul titre original d'une dizaine de mots à propos de Vincent. Du genre "Vincent dans [univers différent] en train de [faire une action liée au développement]".
 			Vincent est un développeur senior qui a tout connu et il est sarcastique et critique souvent les nouvelles technologies ou les mauvaises pratiques, les frameworks à la mode. Ne génère qu'un seul titre.
 			Le titre doit placer Vincent dans un contexte insolite (univers de fiction, lieu improbable, époque historique...) 
-			où il fait un réflexion narquoise, énervée ou ironique sur le monde du développement. Tu dois aussi générer un style graphique unique et originale (bande dessinée belge années 50, manga, univers pirate, caricature journal, ce que tu veux)`;
+			où il fait un réflexion narquoise, énervée ou ironique sur le monde du développement. Tu dois aussi générer un style graphique unique et originale (bande dessinée belge années 50, manga, univers pirate, caricature journal, ce que tu veux), n'enfreignant pas de copyright et ne citant pas de nom d'artistes (utilise plutôt des périphrases) et différent des précédents styles graphiques à chaque fois.`;
 		}
 
+		console.log('prmpt premier du graphic style', prompt);
+
 		const result = await generateObject({
-			model: google('gemini-2.0-flash'),
+			providerOptions: {
+				google: {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					thinkingConfig: {
+						thinkingBudget: 0,
+					},
+				} satisfies GoogleGenerativeAIProviderOptions,
+			},
+			model: google('gemini-2.5-flash-preview-04-17'),
 			prompt,
 			schema: z.object({
 				title: z.string(),
@@ -73,6 +85,7 @@ async function generateCreativeTitle() {
 		const graphicalStyle = result.object.graphicalStyle.trim();
 		const duration = Date.now() - startTime;
 		console.log(`Titre généré en ${duration}ms: "${title}"`);
+		console.log('graphicalStyle généré', graphicalStyle);
 		return { title, graphicalStyle };
 	} catch (error) {
 		console.error('Erreur lors de la génération du titre:', error);
@@ -94,7 +107,7 @@ export async function generateVincentImage() {
 		// Préparer le prompt pour la génération d'image
 		const prompt = `Crée une image humoristique illustrant ce titre: "${title}". 
 		L'image doit montrer Vincent, un développeur senior cynique avec lunettes, dans la cinquantaine, vêtu de noir, 
-		dans la situation décrite par le titre et respectant le style graphique suivant: ${graphicalStyle}. Tu peux trouver une image de référence en pièce-jointe et tu dois t'inspirer de ses traits.`;
+		dans la situation décrite par le titre et respectant le style graphique suivant: ${graphicalStyle} (en évitant les infractions de copyr). Tu peux trouver une image de référence en pièce-jointe et tu dois t'inspirer de ses traits.`;
 
 		// Générer l'image avec le prompt et l'image de référence
 		console.log("Génération de l'image avec OpenAI...");
@@ -121,6 +134,8 @@ export async function generateVincentImage() {
 			{ type: 'image/png' }
 		);
 
+		console.log('PROMPT COMPLET', prompt);
+
 		const rsp = await client.images.edit({
 			model: 'gpt-image-1',
 			image: vincentImageFile,
@@ -130,11 +145,38 @@ export async function generateVincentImage() {
 		console.log(`Image générée en ${Date.now() - imageStartTime}ms`);
 
 		// Enregistrement dans Vercel Blob
-		console.log("Enregistrement de l'image dans Vercel Blob...");
+		console.log(
+			"Compression et enregistrement de l'image dans Vercel Blob..."
+		);
 		const blobStartTime = Date.now();
 
-		const buffer = Buffer.from(rsp.data?.[0]?.b64_json || '', 'base64');
-		const blob = await put(`vincent-${Date.now()}.png`, buffer, {
+		// Convertir l'image base64 en buffer
+		const originalBuffer = Buffer.from(
+			rsp.data?.[0]?.b64_json || '',
+			'base64'
+		);
+
+		// Compresser l'image avec Sharp
+		console.log("Compression de l'image avec Sharp...");
+		const compressStartTime = Date.now();
+
+		const compressedBuffer = await sharp(originalBuffer)
+			.resize(800, 800, { fit: 'inside', withoutEnlargement: true }) // Redimensionner si nécessaire
+			.png({ quality: 80, compressionLevel: 9 }) // Compression PNG optimale
+			.toBuffer();
+
+		console.log(`Image compressée en ${Date.now() - compressStartTime}ms`);
+		console.log(
+			`Taille originale: ${originalBuffer.length} octets, Taille compressée: ${compressedBuffer.length} octets`
+		);
+		console.log(
+			`Réduction: ${Math.round(
+				(1 - compressedBuffer.length / originalBuffer.length) * 100
+			)}%`
+		);
+
+		// Enregistrer l'image compressée dans Vercel Blob
+		const blob = await put(`vincent-${Date.now()}.png`, compressedBuffer, {
 			access: 'public',
 		});
 
