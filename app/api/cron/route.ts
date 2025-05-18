@@ -23,6 +23,3 @@ export async function GET() {
 		);
 	}
 }
-
-// Cette route ne devrait être appelée que par un cron job
-export const dynamic = 'force-dynamic';
