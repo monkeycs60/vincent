@@ -9,7 +9,7 @@ export default async function Home() {
 	const allImages = await getAllImages();
 
 	return (
-		<main className='flex flex-col items-center min-h-screen bg-gray-50'>
+		<main className='flex flex-col items-center min-h-screen bg-neutral-50'>
 			{/* Hero Section avec la dernière image */}
 			<HeroSection latestImage={latestImage} />
 
@@ -30,8 +30,8 @@ export default async function Home() {
 			</section>
 
 			{/* Footer */}
-			<footer className='w-full py-6 bg-purple-900 text-white text-center'>
-				<p className='text-sm opacity-80'>
+			<footer className='w-full py-6 bg-gradient-to-r from-indigo-700 to-indigo-900 text-white text-center shadow-inner'>
+				<p className='text-sm opacity-90'>
 					Vincendrier © {new Date().getFullYear()} - Les images sont
 					générées par l&apos;IA et ne représentent pas de vraies personnes
 				</p>

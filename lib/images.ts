@@ -1,7 +1,10 @@
 import { put } from '@vercel/blob';
 import prisma from './prisma';
 import { generateObject } from 'ai';
-import { createGoogleGenerativeAI, GoogleGenerativeAIProviderOptions } from '@ai-sdk/google';
+import {
+	createGoogleGenerativeAI,
+	GoogleGenerativeAIProviderOptions,
+} from '@ai-sdk/google';
 import { z } from 'zod';
 import OpenAI, { toFile } from 'openai';
 import { Buffer } from 'buffer';
@@ -140,6 +143,7 @@ export async function generateVincentImage() {
 			model: 'gpt-image-1',
 			image: vincentImageFile,
 			prompt,
+			size: '1024x1536',
 		});
 
 		console.log(`Image générée en ${Date.now() - imageStartTime}ms`);

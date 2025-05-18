@@ -26,10 +26,10 @@ export default function RootLayout({
 	return (
 		<html lang='en'>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} bg-purple-100`}>
-				<header className='bg-purple-900 text-white p-4'>
+				className={`${geistSans.variable} ${geistMono.variable} bg-neutral-50`}>
+				<header className='bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-4 shadow-md'>
 					<div className='container mx-auto flex justify-between items-center'>
-						<Link href='/' className='text-xl font-bold'>
+						<Link href='/' className='text-2xl font-bold tracking-tight'>
 							Vincendrier
 						</Link>
 
@@ -38,7 +38,7 @@ export default function RootLayout({
 								<li>
 									<Link
 										href='/generate'
-										className='px-4 py-2 bg-purple-700 hover:bg-purple-600 rounded-md transition-colors'>
+										className='px-5 py-2 bg-white/20 hover:bg-white/30 rounded-md transition-colors backdrop-blur-sm font-medium'>
 										Générer une image
 									</Link>
 								</li>
