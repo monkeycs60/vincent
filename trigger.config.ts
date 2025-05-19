@@ -1,4 +1,5 @@
 import { defineConfig } from '@trigger.dev/sdk/v3';
+import { prismaExtension } from '@trigger.dev/build/extensions/prisma';
 
 export default defineConfig({
 	project: 'proj_ubgqafqiobtbfffcdwuq',
@@ -22,5 +23,11 @@ export default defineConfig({
 	build: {
 		// This is required to use the Sharp library
 		external: ['sharp'],
+		extensions: [
+			prismaExtension({
+				// update this to the path of your Prisma schema file
+				schema: 'prisma/schema.prisma',
+			}),
+		],
 	},
 });
