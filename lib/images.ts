@@ -118,7 +118,7 @@ export async function generateVincentImage() {
 
 		// Télécharger l'image de référence depuis l'URL
 		const imageUrl =
-			'https://cd12r53fudbdemeq.public.blob.vercel-storage.com/vincentbiere-SxVL1chxZY90HxsCmIeuVXqtcVIqwT.png';
+			'https://cd12r53fudbdemeq.public.blob.vercel-storage.com/vincetnsimple-PmcR6Hl8xWPixZCfGoZBJJRLpBxjG3.jpg';
 		console.log(
 			`Téléchargement de l'image de référence depuis ${imageUrl}...`
 		);
