@@ -1,5 +1,4 @@
 import { schedules, logger } from '@trigger.dev/sdk/v3';
-import { generateVincentImage } from '@/lib/images';
 
 export const generateVincentImageTask = schedules.task({
 	id: 'generate-vincent-image-daily',
@@ -14,29 +13,54 @@ export const generateVincentImageTask = schedules.task({
 		);
 
 		try {
-			// Appel direct à la fonction generateVincentImage au lieu de passer par l'API
-			logger.info('Appel direct à la fonction generateVincentImage');
+			// URL absolue codée en dur
+			const apiUrl = 'https://vincent-xi.vercel.app/api/cron';
+			logger.info(`Tentative d'appel à l'API: ${apiUrl}`);
 
-			const newImage = await generateVincentImage();
+			// Configurer un timeout explicite pour fetch
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 secondes timeout
 
-			logger.info('Image de Vincent générée avec succès via appel direct', {
-				imageData: newImage
+			logger.info(`Exécution de fetch vers: ${apiUrl}`);
+			const response = await fetch(apiUrl, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				signal: controller.signal,
+			});
+
+			clearTimeout(timeoutId);
+
+			if (!response.ok) {
+				throw new Error(
+					`Erreur API: ${response.status} ${response.statusText}`
+				);
+			}
+
+			logger.info(`Réponse API reçue avec succès: ${response.status}`);
+			const data = await response.json();
+
+			logger.info("Image de Vincent générée avec succès via l'API", {
+				success: data.success,
+				message: data.message,
+				imageData: data.data
 					? {
-							id: newImage.id,
-							url: newImage.url,
-							title: newImage.title,
+							id: data.data.id,
+							url: data.data.url,
+							title: data.data.title,
 					  }
 					: null,
 			});
 
 			return {
-				success: true,
-				message: 'Image de Vincent générée avec succès',
-				imageData: newImage,
+				success: data.success,
+				message: data.message,
+				imageData: data.data,
 			};
 		} catch (error) {
 			// Capture et journalisation de l'erreur
-			logger.error("Erreur lors de la génération d'image de Vincent", {
+			logger.error("Erreur lors de l'appel à l'API de génération d'image", {
 				errorDetails:
 					error instanceof Error
 						? {
