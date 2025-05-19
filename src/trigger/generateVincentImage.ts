@@ -3,9 +3,9 @@ import { generateVincentImage } from '@/lib/images';
 
 export const generateVincentImageTask = schedules.task({
 	id: 'generate-vincent-image-daily',
-	// Exécution tous les jours à 00h40 heure française (France est UTC+1/+2 selon l'heure d'été)
+	// Exécution tous les jours à 12h00 heure française (France est UTC+1/+2 selon l'heure d'été)
 	cron: {
-		pattern: '45 0 * * *',
+		pattern: '00 12 * * *',
 		timezone: 'Europe/Paris',
 	},
 	run: async () => {
