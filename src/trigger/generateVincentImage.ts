@@ -5,7 +5,7 @@ export const generateVincentImageTask = schedules.task({
 	id: 'generate-vincent-image-daily',
 	// Exécution tous les jours à 00h40 heure française (France est UTC+1/+2 selon l'heure d'été)
 	cron: {
-		pattern: '40 0 * * *',
+		pattern: '45 0 * * *',
 		timezone: 'Europe/Paris',
 	},
 	run: async () => {
