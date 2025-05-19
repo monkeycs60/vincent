@@ -1,4 +1,5 @@
 import { schedules, logger } from '@trigger.dev/sdk/v3';
+import { generateVincentImage } from '@/lib/images';
 
 export const generateVincentImageTask = schedules.task({
 	id: 'generate-vincent-image-daily',
@@ -13,50 +14,28 @@ export const generateVincentImageTask = schedules.task({
 		);
 
 		try {
-			// URL absolue codée en dur
-			const apiUrl = 'https://vincent-xi.vercel.app/api/cron';
-			logger.info(`Tentative d'appel à l'API: ${apiUrl}`);
+			// Appel direct à la fonction generateVincentImage
+			logger.info('Appel direct à la fonction generateVincentImage');
 
+			const newImage = await generateVincentImage();
 
-			logger.info(`Exécution de fetch vers: ${apiUrl}`);
-			const response = await fetch(apiUrl, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
+			logger.info('Image de Vincent générée avec succès', {
+				imageData: {
+					id: newImage.id,
+					url: newImage.url,
+					title: newImage.title,
+					graphicalStyle: newImage.graphicalStyle,
 				},
 			});
 
-			clearTimeout(timeoutId);
-
-			if (!response.ok) {
-				throw new Error(
-					`Erreur API: ${response.status} ${response.statusText}`
-				);
-			}
-
-			logger.info(`Réponse API reçue avec succès: ${response.status}`);
-			const data = await response.json();
-
-			logger.info("Image de Vincent générée avec succès via l'API", {
-				success: data.success,
-				message: data.message,
-				imageData: data.data
-					? {
-							id: data.data.id,
-							url: data.data.url,
-							title: data.data.title,
-					  }
-					: null,
-			});
-
 			return {
-				success: data.success,
-				message: data.message,
-				imageData: data.data,
+				success: true,
+				message: 'Image de Vincent générée avec succès',
+				imageData: newImage,
 			};
 		} catch (error) {
 			// Capture et journalisation de l'erreur
-			logger.error("Erreur lors de l'appel à l'API de génération d'image", {
+			logger.error("Erreur lors de la génération d'image de Vincent", {
 				errorDetails:
 					error instanceof Error
 						? {
