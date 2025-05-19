@@ -14,28 +14,9 @@ export const generateVincentImageTask = schedules.task({
 		);
 
 		try {
-			// Déterminer l'URL de base
-			const baseUrl = process.env.VERCEL_URL || 'localhost:3000';
-			logger.info(`VERCEL_URL original: "${process.env.VERCEL_URL}"`);
-
-			// Construire l'URL finale
-			let apiUrl;
-			if (baseUrl.startsWith('http://') || baseUrl.startsWith('https://')) {
-				// Utiliser l'URL complète telle quelle, en ajoutant juste le chemin
-				apiUrl = `${baseUrl}/api/cron`;
-				logger.info(
-					`URL complète détectée - Utilisation directe: ${apiUrl}`
-				);
-			} else {
-				// Ajouter le préfixe approprié
-				apiUrl =
-					baseUrl === 'localhost:3000'
-						? `http://${baseUrl}/api/cron`
-						: `https://${baseUrl}/api/cron`;
-				logger.info(`Préfixe ajouté à l'URL: ${apiUrl}`);
-			}
-
-			logger.info(`Tentative d'appel à l'API: ${apiUrl}`);
+			// URL codée en dur - plus de dépendance à process.env.VERCEL_URL
+			const apiUrl = 'https://vincent-xi.vercel.app/api/cron';
+			logger.info(`Utilisation de l'URL codée en dur: ${apiUrl}`);
 
 			// Essayer avec une URL test externe d'abord pour voir si fetch fonctionne
 			try {
@@ -74,20 +55,6 @@ export const generateVincentImageTask = schedules.task({
 					errorMessage:
 						error instanceof Error ? error.message : String(error),
 				});
-
-				// Tentative alternative avec une autre URL
-				if (process.env.VERCEL_URL) {
-					const altUrl = `https://vincent-xi.vercel.app/api/cron`;
-					logger.info(
-						`Tentative alternative avec URL codée en dur: ${altUrl}`
-					);
-					return fetch(altUrl, {
-						method: 'GET',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-					});
-				}
 				throw error;
 			});
 
