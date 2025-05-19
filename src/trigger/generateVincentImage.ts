@@ -7,16 +7,29 @@ export const generateVincentImageTask = schedules.task({
 		pattern: '15 0 * * *',
 		timezone: 'Europe/Paris',
 	},
-	run: async (payload) => {
+	run: async () => {
 		logger.info(
 			"Démarrage de la tâche de génération d'image quotidienne de Vincent..."
 		);
 
 		try {
-			// Appel à l'API existante qui utilise generateVincentImage
-			const apiUrl = process.env.VERCEL_URL
-				? `https://${process.env.VERCEL_URL}/api/cron`
-				: 'http://localhost:3000/api/cron';
+			// Déterminer l'URL de base
+			const baseUrl = process.env.VERCEL_URL || 'localhost:3000';
+
+			// Construire l'URL finale
+			let apiUrl;
+			if (baseUrl.startsWith('http://') || baseUrl.startsWith('https://')) {
+				// Utiliser l'URL complète telle quelle, en ajoutant juste le chemin
+				apiUrl = `${baseUrl}/api/cron`;
+			} else {
+				// Ajouter le préfixe approprié
+				apiUrl =
+					baseUrl === 'localhost:3000'
+						? `http://${baseUrl}/api/cron`
+						: `https://${baseUrl}/api/cron`;
+			}
+
+			logger.info(`Appel à l'API: ${apiUrl}`);
 
 			const response = await fetch(apiUrl, {
 				method: 'GET',
