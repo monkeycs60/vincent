@@ -17,9 +17,6 @@ export const generateVincentImageTask = schedules.task({
 			const apiUrl = 'https://vincent-xi.vercel.app/api/cron';
 			logger.info(`Tentative d'appel à l'API: ${apiUrl}`);
 
-			// Configurer un timeout explicite pour fetch
-			const controller = new AbortController();
-			const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 secondes timeout
 
 			logger.info(`Exécution de fetch vers: ${apiUrl}`);
 			const response = await fetch(apiUrl, {
@@ -27,7 +24,6 @@ export const generateVincentImageTask = schedules.task({
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				signal: controller.signal,
 			});
 
 			clearTimeout(timeoutId);
