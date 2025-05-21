@@ -1,6 +1,7 @@
 import React from 'react';
 import HeroSection from '@/components/hero-section';
 import GridGallery from '@/components/ui/grid-gallery';
+import VincentCalendar from '@/components/ui/vincent-calendar';
 import { getLatestImage, getAllImages } from '@/lib/images';
 
 export default async function Home() {
@@ -12,6 +13,11 @@ export default async function Home() {
 		<main className='flex flex-col items-center min-h-screen '>
 			{/* Hero Section avec la dernière image */}
 			<HeroSection latestImage={latestImage} />
+
+			{/* Section Calendrier */}
+			<section id='calendar' className='w-full max-w-7xl mx-auto'>
+				<VincentCalendar images={allImages} />
+			</section>
 
 			{/* Section Galerie */}
 			<section
@@ -35,9 +41,9 @@ export default async function Home() {
 			{/* Footer */}
 			<footer className='w-full py-6 bg-gradient-to-r from-indigo-700 to-indigo-900 text-white text-center shadow-inner'>
 				<p className='text-sm opacity-90'>
-					Vincendrier © {new Date().getFullYear()} - Toutes les images
-					sont générées par l&apos;IA. Toute ressemblance avec la réalité
-					serait purement accidentelle.
+					Vincendrier © {new Date().getFullYear()} - Toutes les images sont
+					générées par l&apos;IA. Toute ressemblance avec la réalité serait
+					purement accidentelle.
 				</p>
 			</footer>
 		</main>
