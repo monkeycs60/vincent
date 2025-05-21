@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Image as ImageType } from '@/app/generated/prisma/index';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ImageModal from './image-modal';
 
 interface VincentCalendarProps {
@@ -31,8 +31,6 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 	const [isMobile, setIsMobile] = useState(false);
 
 	const timelineRef = useRef<HTMLDivElement>(null);
-	const touchStartX = useRef(0);
-	const scrollStartX = useRef(0);
 
 	// Détecter si on est sur mobile
 	useEffect(() => {
@@ -64,16 +62,27 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 	// Fonction pour obtenir les jours de la semaine actuelle, limités à 3 sur mobile
 	const getWeekDays = () => {
 		const days = [];
-		const daysToShow = isMobile ? 3 : 7;
 
-		// Sur mobile, afficher les 3 derniers jours (aujourd'hui et les 2 précédents)
-		const startIndex = isMobile ? 4 : 0;
+		if (isMobile) {
+			// Sur mobile, afficher les 3 derniers jours, avec aujourd'hui comme dernier jour
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
 
-		for (let i = startIndex; i < startIndex + daysToShow; i++) {
-			const day = new Date(currentWeekStart);
-			day.setDate(currentWeekStart.getDate() + i);
-			days.push(day);
+			// Ajouter aujourd'hui et les 2 jours précédents
+			for (let i = 2; i >= 0; i--) {
+				const day = new Date(today);
+				day.setDate(today.getDate() - i);
+				days.push(day);
+			}
+		} else {
+			// Sur desktop, afficher les 7 jours de la semaine
+			for (let i = 0; i < 7; i++) {
+				const day = new Date(currentWeekStart);
+				day.setDate(currentWeekStart.getDate() + i);
+				days.push(day);
+			}
 		}
+
 		return days;
 	};
 
@@ -121,20 +130,6 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 		setIsModalOpen(false);
 	};
 
-	// Gestionnaires d'événements tactiles pour le défilement sur mobile
-	const handleTouchStart = (e: React.TouchEvent) => {
-		if (!timelineRef.current) return;
-		touchStartX.current = e.touches[0].clientX;
-		scrollStartX.current = timelineRef.current.scrollLeft;
-	};
-
-	const handleTouchMove = (e: React.TouchEvent) => {
-		if (!timelineRef.current) return;
-		const touchX = e.touches[0].clientX;
-		const diffX = touchStartX.current - touchX;
-		timelineRef.current.scrollLeft = scrollStartX.current + diffX;
-	};
-
 	// Noms courts des jours de la semaine
 	const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
@@ -178,19 +173,12 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 				{/* Conteneur des jours avec padding pour les flèches (ajustement pour mobile) */}
 				<div
 					ref={timelineRef}
-					className='flex justify-between items-end md:px-10 py-6 overflow-x-auto md:overflow-x-hidden scrollbar-hide'
-					style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-					onTouchStart={handleTouchStart}
-					onTouchMove={handleTouchMove}>
+					className='flex justify-between items-end md:px-10 py-6 overflow-x-auto md:overflow-visible'
+					style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
 					<style jsx global>{`
 						/* Cacher la scrollbar pour Chrome, Safari et Opera */
-						.scrollbar-hide::-webkit-scrollbar {
+						div::-webkit-scrollbar {
 							display: none;
-						}
-						/* Cacher la scrollbar pour IE, Edge et Firefox */
-						.scrollbar-hide {
-							-ms-overflow-style: none; /* IE et Edge */
-							scrollbar-width: none; /* Firefox */
 						}
 					`}</style>
 
