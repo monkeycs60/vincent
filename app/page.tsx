@@ -22,8 +22,9 @@ export default async function Home() {
 						La Collection Vincent
 					</h2>
 					<p className='text-lg text-gray-600 max-w-2xl mx-auto'>
-						Découvrez toutes les images de Vincent générées par l&apos;IA,
-						des situations les plus cocasses aux plus absurdes !
+						Pendant que vous vous tourniez les pouces, l&apos;IA ne vous a
+						pas attendu pour capturer chaque jour la substantifique moelle
+						de Vincent.
 					</p>
 				</div>
 
