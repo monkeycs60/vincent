@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Image as ImageType } from '@/app/generated/prisma/index';
 import { motion } from 'framer-motion';
@@ -25,9 +25,22 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 
 	// États pour l'image survolée et la modale
 	const [hoveredImage, setHoveredImage] = useState<ImageType | null>(null);
-	const [hoveredPosition, setHoveredPosition] = useState({ x: 0, y: 0 });
 	const [modalImage, setModalImage] = useState<ImageType | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+	// Gestionnaire d'événements de souris global
+	useEffect(() => {
+		const handleMouseMove = (e: MouseEvent) => {
+			setMousePosition({ x: e.clientX, y: e.clientY });
+		};
+
+		window.addEventListener('mousemove', handleMouseMove);
+		
+		return () => {
+			window.removeEventListener('mousemove', handleMouseMove);
+		};
+	}, []);
 
 	// Fonction pour obtenir les jours de la semaine actuelle
 	const getWeekDays = () => {
@@ -84,22 +97,6 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 		setIsModalOpen(false);
 	};
 
-	// Fonction pour gérer le survol d'une image avec position
-	const handleMouseEnter = (image: ImageType, e: React.MouseEvent) => {
-		setHoveredImage(image);
-		setHoveredPosition({ x: e.clientX, y: e.clientY });
-	};
-
-	const handleMouseMove = (e: React.MouseEvent) => {
-		if (hoveredImage) {
-			setHoveredPosition({ x: e.clientX, y: e.clientY });
-		}
-	};
-
-	const handleMouseLeave = () => {
-		setHoveredImage(null);
-	};
-
 	// Noms courts des jours de la semaine
 	const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
@@ -115,7 +112,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 			<div className='relative'>
 				{/* Ligne de temps */}
 				<div className='absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-200 via-purple-300 to-pink-200 transform -translate-y-1/2 z-0'></div>
-				
+
 				{/* Flèche gauche */}
 				<div className='absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-6 z-10'>
 					<motion.button
@@ -126,7 +123,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 						<ChevronLeft className='h-5 w-5' />
 					</motion.button>
 				</div>
-				
+
 				{/* Flèche droite */}
 				<div className='absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-6 z-10'>
 					<motion.button
@@ -137,7 +134,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 						<ChevronRight className='h-5 w-5' />
 					</motion.button>
 				</div>
-				
+
 				{/* Conteneur des jours avec padding pour les flèches */}
 				<div className='flex justify-between items-end px-10 py-6 overflow-x-auto'>
 					{weekDays.map((date, index) => {
@@ -154,49 +151,62 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 									relative flex flex-col items-center
 									${isToday ? 'z-10' : ''}
 									min-w-[80px] mx-1 md:mx-2
-								`}
-								onMouseEnter={(e) => image && handleMouseEnter(image, e)}
-								onMouseMove={handleMouseMove}
-								onMouseLeave={handleMouseLeave}>
-								
+								`}>
 								{/* Jour du mois */}
-								<div className={`
+								<div
+									className={`
 									mb-2 font-bold text-lg rounded-full w-10 h-10 flex items-center justify-center
-									${isToday 
-										? 'bg-indigo-600 text-white shadow-md shadow-indigo-300' 
-										: 'bg-white text-gray-700 border border-gray-200'}
+									${
+										isToday
+											? 'bg-indigo-600 text-white shadow-md shadow-indigo-300'
+											: 'bg-white text-gray-700 border border-gray-200'
+									}
 								`}>
 									{date.getDate()}
 								</div>
-								
+
 								{/* Jour de la semaine */}
-								<div className='text-xs text-gray-500 mb-2'>{dayName}</div>
-								
+								<div className='text-xs text-gray-500 mb-2'>
+									{dayName}
+								</div>
+
 								{/* Image du jour */}
 								<div
 									className={`
 										relative w-16 h-24 md:w-20 md:h-28 rounded-xl overflow-hidden shadow-md 
 										${image ? 'cursor-pointer' : 'bg-gray-100 opacity-40'}
-										${isToday ? 'shadow-lg shadow-purple-200 border-2 border-indigo-400' : 'border border-gray-200'}
+										${
+											isToday
+												? 'shadow-lg shadow-purple-200 border-2 border-indigo-400'
+												: 'border border-gray-200'
+										}
 									`}
-									onClick={() => image && openModal(image)}>
+									onClick={() => image && openModal(image)}
+									onMouseEnter={() => image && setHoveredImage(image)}
+									onMouseLeave={() => setHoveredImage(null)}>
 									{image ? (
 										<Image
 											src={image.url}
-											alt={image.title || `Vincent du ${date.toLocaleDateString()}`}
+											alt={
+												image.title ||
+												`Vincent du ${date.toLocaleDateString()}`
+											}
 											fill
 											className='object-cover'
 											sizes='(max-width: 768px) 80px, 100px'
 										/>
 									) : (
 										<div className='h-full w-full flex items-center justify-center'>
-											<span className='text-gray-400 text-xs text-center px-1'>Pas d&apos;image</span>
+											<span className='text-gray-400 text-xs text-center px-1'>
+												Pas d&apos;image
+											</span>
 										</div>
 									)}
 								</div>
-								
+
 								{/* Point sur la timeline */}
-								<div className={`
+								<div
+									className={`
 									w-3 h-3 rounded-full mt-4
 									${image ? 'bg-indigo-600' : 'bg-gray-300'}
 									${isToday ? 'w-4 h-4 mt-3.5' : ''}
@@ -209,21 +219,15 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 
 			{/* Image agrandie au survol */}
 			{hoveredImage && (
-				<motion.div 
-					initial={{ opacity: 0, scale: 0.8 }}
-					animate={{ 
-						opacity: 1, 
-						scale: 1,
-						x: hoveredPosition.x < window.innerWidth / 2 
-							? hoveredPosition.x + 20 
-							: hoveredPosition.x - 220,
-						y: hoveredPosition.y < window.innerHeight / 2 
-							? hoveredPosition.y + 20 
-							: hoveredPosition.y - 300
-					}}
-					className='fixed z-50 bg-white rounded-xl shadow-xl overflow-hidden w-60'
-					style={{ pointerEvents: 'none' }}>
-					<div className='relative w-60 h-80'>
+				<div 
+					className='fixed z-[9999] bg-white rounded-xl shadow-xl overflow-hidden'
+					style={{ 
+						left: mousePosition.x < window.innerWidth/2 ? mousePosition.x + 20 : mousePosition.x - 280,
+						top: mousePosition.y < window.innerHeight/2 ? mousePosition.y + 20 : mousePosition.y - 300,
+						width: '260px',
+						pointerEvents: 'none'
+					}}>
+					<div className='relative w-full h-80'>
 						<Image
 							src={hoveredImage.url}
 							alt={hoveredImage.title || 'Image Vincent'}
@@ -233,12 +237,14 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 						/>
 					</div>
 					<div className='p-3 bg-white'>
-						<p className='font-bold italic text-sm'>{hoveredImage.title}</p>
+						<p className='font-bold italic text-sm'>
+							{hoveredImage.title}
+						</p>
 						<p className='text-xs text-gray-500 mt-1'>
 							{new Date(hoveredImage.createdAt).toLocaleDateString()}
 						</p>
 					</div>
-				</motion.div>
+				</div>
 			)}
 
 			{/* Modale pour l'image en plein écran */}
