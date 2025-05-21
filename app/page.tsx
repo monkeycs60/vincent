@@ -9,12 +9,14 @@ export default async function Home() {
 	const allImages = await getAllImages();
 
 	return (
-		<main className='flex flex-col items-center min-h-screen bg-neutral-50'>
+		<main className='flex flex-col items-center min-h-screen '>
 			{/* Hero Section avec la dernière image */}
 			<HeroSection latestImage={latestImage} />
 
 			{/* Section Galerie */}
-			<section className='w-full py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto'>
+			<section
+				id='gallery'
+				className='w-full py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto'>
 				<div className='mb-10 text-center'>
 					<h2 className='text-3xl md:text-4xl font-bold mb-3 text-gray-900'>
 						La Collection Vincent

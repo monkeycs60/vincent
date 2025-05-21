@@ -2,9 +2,10 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Image as ImageType } from '@/app/generated/prisma/index';
 import { motion } from 'framer-motion';
-import { ChevronDown, Sparkles } from 'lucide-react';
+import { CameraIcon, Grid2X2, Calendar, Heart, ArrowRight } from 'lucide-react';
 
 interface HeroSectionProps {
 	latestImage: ImageType | null;
@@ -14,107 +15,151 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 	// Si aucune image n'existe encore
 	if (!latestImage) {
 		return (
-			<div className='min-h-[70vh] w-full flex flex-col items-center justify-center bg-gradient-to-br from-indigo-100 to-indigo-200 text-center px-4'>
-				<h1 className='text-4xl md:text-6xl font-bold mb-6 text-indigo-800'>
-					Vincendrier
-				</h1>
-				<p className='text-xl md:text-2xl mb-8 max-w-2xl'>
-					Aucune image de Vincent n&apos;a encore été générée. Revenez plus
-					tard !
-				</p>
+			<div className='min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-pink-100 via-purple-100 to-indigo-100 text-center px-4'>
+				<motion.div
+					initial={{ scale: 0.8, opacity: 0 }}
+					animate={{ scale: 1, opacity: 1 }}
+					transition={{
+						type: 'spring',
+						stiffness: 260,
+						damping: 20,
+					}}
+					className='bg-white p-8 rounded-3xl shadow-xl max-w-md'>
+					<h1 className='text-3xl md:text-5xl font-extrabold mb-5 bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 text-transparent bg-clip-text'>
+						Vincendrier
+					</h1>
+					<p className='text-lg md:text-xl mb-6 max-w-2xl text-gray-600'>
+						Aucune image de Vincent n&apos;a encore été générée. Revenez
+						plus tard !
+					</p>
+				</motion.div>
 			</div>
 		);
 	}
 
 	return (
-		<section className='relative w-full min-h-[90vh] flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-indigo-50 to-white'>
-			{/* Arrière-plan avec effet de flou */}
-			<div className='absolute inset-0 z-0 opacity-10'>
-				<Image
-					src={latestImage.url}
-					alt='Vincent background'
-					fill
-					className='object-cover'
-					priority
-				/>
-			</div>
-
-			<div className='container mx-auto px-4 py-16 z-10'>
-				<motion.div
-					className='flex flex-col md:flex-row items-center gap-10'
-					initial={{ opacity: 0, y: 20 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.8 }}>
-					{/* Image avec ratio 3:2 (1536:1024) */}
+		<section className='relative w-full py-8  overflow-hidden max-w-7xl mx-auto'>
+			<div className='container mx-auto px-4 relative z-10'>
+				<div className='flex flex-col md:flex-row md:items-center gap-8 md:gap-12 md:mx-auto md:justify-between'>
+					{/* Image à gauche avec dimensions réduites */}
 					<motion.div
-						className='relative w-full md:w-1/2 aspect-[3/2] rounded-xl overflow-hidden shadow-xl border-4 border-white'
-						whileHover={{ scale: 1.02, rotate: -0.5 }}
-						transition={{ type: 'spring', stiffness: 300 }}>
-						<Image
-							src={latestImage.url}
-							alt={latestImage.title}
-							fill
-							className='object-cover'
-							priority
-							sizes='(max-width: 768px) 100vw, 50vw'
-						/>
+						className='md:w-auto md:flex-shrink-0'
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.8 }}
+						whileHover={{ scale: 1.02, rotate: 1 }}
+						whileTap={{ scale: 0.98 }}>
+						<div className='relative w-full aspect-[2/3] md:h-[600px] rounded-2xl overflow-hidden border-6 border-white'>
+							<Image
+								src={latestImage.url}
+								alt={latestImage.title}
+								fill
+								className='object-cover'
+								priority
+								sizes='(max-width: 768px) 100vw, 460px'
+							/>
 
-						{/* Badge "Vincent du jour" */}
-						<div className='absolute top-4 right-4 bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-medium transform rotate-3 shadow-lg'>
-							Vincent du jour
+							{/* Badge du jour plus fun et animé */}
+							<motion.div
+								className='absolute top-4 right-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg'
+								animate={{ scale: [1, 1.05, 1], rotate: [0, 2, 0] }}
+								transition={{
+									duration: 2,
+									repeat: Infinity,
+									repeatType: 'reverse',
+								}}>
+								Vincent du jour
+							</motion.div>
 						</div>
 					</motion.div>
 
-					{/* Contenu */}
-					<div className='w-full md:w-1/2 space-y-7'>
-						<motion.div
-							className='flex items-center gap-2'
-							initial={{ opacity: 0, x: -20 }}
+					{/* Contenu à droite */}
+					<div className='w-1/2 flex flex-col justify-center space-y-6'>
+						{/* Titre principal avec effet de gradient */}
+						<motion.h1
+							className='text-3xl md:text-4xl lg:text-6xl font-extrabold text-left leading-tight bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 text-transparent bg-clip-text'
+							initial={{ opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
-							transition={{ delay: 0.2, duration: 0.6 }}>
-							<Sparkles className='h-9 w-9 text-indigo-500' />
-							<h1 className='text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight'>
-								Vincent du jour
-							</h1>
+							transition={{ duration: 0.7 }}>
+							Chaque jour, une IA torture Vincent.
+						</motion.h1>
+
+						{/* Sous-titre avec le nom de l'image */}
+						<motion.div
+							className='bg-white p-5 rounded-xl shadow-lg border-2 border-purple-100'
+							initial={{ opacity: 0, x: 20 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ delay: 0.3, duration: 0.6 }}
+							whileHover={{
+								y: -4,
+								boxShadow: '0 12px 25px rgba(131,56,236,0.2)',
+							}}>
+							<div className='flex items-start gap-3'>
+								<span className='text-2xl'>🗣️</span>
+								<div>
+									<h2 className='text-xl font-bold text-gray-800 mb-1'>
+										&quot;{latestImage.title}&quot;
+									</h2>
+									<p className='text-gray-500 text-xs flex items-center gap-1'>
+										<Calendar className='h-3 w-3' />
+										Généré le{' '}
+										{new Date(
+											latestImage.createdAt
+										).toLocaleDateString()}
+									</p>
+								</div>
+							</div>
 						</motion.div>
 
+						{/* Pourquoi Vincent - section plus chaleureuse */}
 						<motion.div
-							className='bg-white p-7 rounded-xl shadow-lg border border-indigo-100'
-							initial={{ opacity: 0, x: -20 }}
+							className='bg-white p-5 rounded-xl shadow-lg border-2 border-pink-100'
+							initial={{ opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
-							transition={{ delay: 0.4, duration: 0.6 }}>
-							<p className='text-xl md:text-2xl font-bold italic text-gray-800 mb-3'>
-								&quot;{latestImage.title}&quot;
-							</p>
-							<p className='text-gray-500 text-sm font-medium flex items-center gap-1'>
-								Généré le{' '}
-								{new Date(latestImage.createdAt).toLocaleDateString()}
-							</p>
+							transition={{ delay: 0.5, duration: 0.6 }}
+							whileHover={{
+								y: -4,
+								boxShadow: '0 12px 25px rgba(236,72,153,0.2)',
+							}}>
+							<div className='flex items-start gap-3'>
+								<span className='text-2xl'>❓</span>
+								<div>
+									<h3 className='text-lg font-bold mb-2 flex items-center gap-2'>
+										Pourquoi Vincent ?
+										<Heart className='h-4 w-4 text-pink-500 fill-pink-500' />
+									</h3>
+									<p className='text-gray-700 text-sm'>
+										Vincent n&apos;a rien demandé, mais le monde doit
+										voir ça. Un développeur râleur devenu malgré lui
+										la star d&apos;un délire généré par IA.
+									</p>
+								</div>
+							</div>
 						</motion.div>
 
-						<motion.p
-							className='text-gray-700 text-base md:text-lg bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-400'
-							initial={{ opacity: 0, x: -20 }}
+						{/* CTAs plus ludiques */}
+						<motion.div
+							className='flex flex-col sm:flex-row gap-3'
+							initial={{ opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
-							transition={{ delay: 0.6, duration: 0.6 }}>
-							Chaque jour à midi, l&apos;IA génère une nouvelle image de
-							Vincent dans des situations cocasses.
-						</motion.p>
+							transition={{ delay: 0.7, duration: 0.6 }}>
+							<Link
+								href='/generate'
+								className='bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-5 rounded-lg text-center shadow-lg transition-all flex items-center justify-center gap-2 flex-1 group text-sm'>
+								<CameraIcon className='w-4 h-4 group-hover:rotate-12 transition-transform' />
+								<span>Générer une absurdité</span>
+							</Link>
+							<Link
+								href='#gallery'
+								className='bg-white hover:bg-gray-50 text-indigo-600 font-bold py-3 px-5 rounded-lg text-center border-2 border-indigo-200 shadow-md transition-all flex items-center justify-center gap-2 flex-1 group text-sm'>
+								<Grid2X2 className='w-4 h-4' />
+								<span>Explorer la galerie</span>
+								<ArrowRight className='w-0 h-4 opacity-0 group-hover:w-4 group-hover:opacity-100 transition-all duration-300' />
+							</Link>
+						</motion.div>
 					</div>
-				</motion.div>
-			</div>
-
-			{/* Flèche de défilement */}
-			<motion.div
-				className='absolute bottom-8 left-1/2 transform -translate-x-1/2'
-				initial={{ opacity: 0, y: -10 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ delay: 1, duration: 0.5 }}
-				whileHover={{ y: 5 }}>
-				<div className='bg-white/80 backdrop-blur-sm p-3 rounded-full shadow-md'>
-					<ChevronDown className='w-6 h-6 text-indigo-600' />
 				</div>
-			</motion.div>
+			</div>
 		</section>
 	);
 }
