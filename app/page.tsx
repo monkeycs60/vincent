@@ -2,6 +2,7 @@ import React from 'react';
 import HeroSection from '@/components/hero-section';
 import GridGallery from '@/components/ui/grid-gallery';
 import VincentCalendar from '@/components/ui/vincent-calendar';
+import MobileCalendarSlider from '@/components/ui/mobile-calendar-slider';
 import { getLatestImage, getAllImages } from '@/lib/images';
 
 export default async function Home() {
@@ -16,7 +17,15 @@ export default async function Home() {
 
 			{/* Section Calendrier */}
 			<section id='calendar' className='w-full max-w-7xl mx-auto'>
-				<VincentCalendar images={allImages} />
+				{/* Version mobile (visible uniquement sur mobile) */}
+				<div className='md:hidden'>
+					<MobileCalendarSlider images={allImages} />
+				</div>
+
+				{/* Version desktop (cachée sur mobile) */}
+				<div className='hidden md:block'>
+					<VincentCalendar images={allImages} />
+				</div>
 			</section>
 
 			{/* Section Galerie */}
