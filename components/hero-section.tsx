@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Image as ImageType } from '@/app/generated/prisma/index';
 import { motion } from 'framer-motion';
-import { CameraIcon, Grid2X2, Calendar, Heart, ArrowRight } from 'lucide-react';
+import { Grid2X2, Calendar, Heart, ArrowRight } from 'lucide-react';
 
 interface HeroSectionProps {
 	latestImage: ImageType | null;
@@ -38,7 +38,7 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 	}
 
 	return (
-		<section className='relative w-full py-8  overflow-hidden max-w-7xl mx-auto'>
+		<section className='relative w-full py-4 overflow-hidden max-w-7xl mx-auto'>
 			<div className='container mx-auto px-4 relative z-10'>
 				<div className='flex flex-col md:flex-row md:items-center gap-8 md:gap-12 md:mx-auto md:justify-between'>
 					{/* Image à gauche avec dimensions réduites */}
@@ -139,19 +139,13 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 
 						{/* CTAs plus ludiques */}
 						<motion.div
-							className='flex flex-col sm:flex-row gap-3'
+							className='flex flex-col sm:flex-row gap-3 justify-center'
 							initial={{ opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ delay: 0.7, duration: 0.6 }}>
 							<Link
-								href='/generate'
-								className='bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-5 rounded-lg text-center shadow-lg transition-all flex items-center justify-center gap-2 flex-1 group text-sm'>
-								<CameraIcon className='w-4 h-4 group-hover:rotate-12 transition-transform' />
-								<span>Générer une absurdité</span>
-							</Link>
-							<Link
 								href='#gallery'
-								className='bg-white hover:bg-gray-50 text-indigo-600 font-bold py-3 px-5 rounded-lg text-center border-2 border-indigo-200 shadow-md transition-all flex items-center justify-center gap-2 flex-1 group text-sm'>
+								className='bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-5 rounded-lg text-center shadow-lg transition-all flex items-center justify-center gap-2 group text-sm md:w-2/3 mx-auto'>
 								<Grid2X2 className='w-4 h-4' />
 								<span>Explorer la galerie</span>
 								<ArrowRight className='w-0 h-4 opacity-0 group-hover:w-4 group-hover:opacity-100 transition-all duration-300' />
