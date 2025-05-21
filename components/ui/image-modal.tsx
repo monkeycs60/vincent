@@ -59,7 +59,7 @@ export default function ImageModal({
 						animate={{ scale: 1, opacity: 1 }}
 						exit={{ scale: 0.9, opacity: 0 }}
 						transition={{ type: 'spring', damping: 25 }}
-						className='relative bg-white p-2 rounded-xl max-w-4xl mx-auto flex flex-col items-center justify-center'
+						className='relative bg-white p-2 rounded-xl md:max-w-4xl mx-auto flex flex-col items-center justify-center'
 						onClick={(e) => e.stopPropagation()}>
 						{/* Bouton de fermeture */}
 						<button

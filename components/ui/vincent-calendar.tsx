@@ -36,7 +36,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 		};
 
 		window.addEventListener('mousemove', handleMouseMove);
-		
+
 		return () => {
 			window.removeEventListener('mousemove', handleMouseMove);
 		};
@@ -219,15 +219,21 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 
 			{/* Image agrandie au survol */}
 			{hoveredImage && (
-				<div 
+				<div
 					className='fixed z-[9999] bg-white rounded-xl shadow-xl overflow-hidden'
-					style={{ 
-						left: mousePosition.x < window.innerWidth/2 ? mousePosition.x + 20 : mousePosition.x - 280,
-						top: mousePosition.y < window.innerHeight/2 ? mousePosition.y + 20 : mousePosition.y - 300,
+					style={{
+						left:
+							mousePosition.x < window.innerWidth / 2
+								? mousePosition.x + 20
+								: mousePosition.x - 280,
+						top:
+							mousePosition.y < window.innerHeight / 2
+								? mousePosition.y + 20
+								: mousePosition.y - 300,
 						width: '260px',
-						pointerEvents: 'none'
+						pointerEvents: 'none',
 					}}>
-					<div className='relative w-full h-80'>
+					<div className='relative w-full h-96 rounded-xl w'>
 						<Image
 							src={hoveredImage.url}
 							alt={hoveredImage.title || 'Image Vincent'}
