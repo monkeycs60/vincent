@@ -39,7 +39,7 @@ export default function GridGallery({ images }: GridGalleryProps) {
 			{images.map((image, index) => (
 				<motion.div
 					key={image.id}
-					className='relative mb-4 group overflow-hidden rounded-xl'
+					className='relative mb-4 group overflow-hidden rounded-xl shadow-md'
 					variants={itemVariants}
 					initial='hidden'
 					animate='visible'
@@ -50,12 +50,12 @@ export default function GridGallery({ images }: GridGalleryProps) {
 						boxShadow:
 							'0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
 					}}>
-					<div className='relative aspect-[2/3] overflow-hidden border-4 border-white'>
+					<div className='relative aspect-[2/3] overflow-hidden'>
 						<Image
 							src={image.url}
 							alt={image.title}
 							fill
-							className='object-cover rounded-xl transition-transform duration-500 group-hover:scale-105'
+							className='object-cover transition-transform duration-500 group-hover:scale-105'
 							sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
 						/>
 					</div>
