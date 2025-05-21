@@ -28,23 +28,8 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 	const [modalImage, setModalImage] = useState<ImageType | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-	const [isMobile, setIsMobile] = useState(false);
 
 	const timelineRef = useRef<HTMLDivElement>(null);
-
-	// Détecter si on est sur mobile
-	useEffect(() => {
-		const checkIfMobile = () => {
-			setIsMobile(window.innerWidth < 768);
-		};
-
-		checkIfMobile();
-		window.addEventListener('resize', checkIfMobile);
-
-		return () => {
-			window.removeEventListener('resize', checkIfMobile);
-		};
-	}, []);
 
 	// Gestionnaire d'événements de souris global
 	useEffect(() => {
@@ -63,24 +48,11 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 	const getWeekDays = () => {
 		const days = [];
 
-		if (isMobile) {
-			// Sur mobile, afficher les 3 derniers jours, avec aujourd'hui comme dernier jour
-			const today = new Date();
-			today.setHours(0, 0, 0, 0);
-
-			// Ajouter aujourd'hui et les 2 jours précédents
-			for (let i = 2; i >= 0; i--) {
-				const day = new Date(today);
-				day.setDate(today.getDate() - i);
-				days.push(day);
-			}
-		} else {
-			// Sur desktop, afficher les 7 jours de la semaine
-			for (let i = 0; i < 7; i++) {
-				const day = new Date(currentWeekStart);
-				day.setDate(currentWeekStart.getDate() + i);
-				days.push(day);
-			}
+		// Sur desktop, afficher les 7 jours de la semaine
+		for (let i = 0; i < 7; i++) {
+			const day = new Date(currentWeekStart);
+			day.setDate(currentWeekStart.getDate() + i);
+			days.push(day);
 		}
 
 		return days;
@@ -146,29 +118,27 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 				<div className='absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-200 via-purple-300 to-pink-200 transform -translate-y-1/2 z-0'></div>
 
 				{/* Flèches de navigation (visibles uniquement sur desktop) */}
-				{!isMobile && (
-					<>
-						<div className='absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-6 z-10'>
-							<motion.button
-								onClick={goToPreviousWeek}
-								className='p-3 rounded-full bg-white shadow-lg text-indigo-600 hover:text-indigo-800 border border-indigo-100'
-								whileHover={{ scale: 1.1, x: -2 }}
-								whileTap={{ scale: 0.95 }}>
-								<ChevronLeft className='h-5 w-5' />
-							</motion.button>
-						</div>
+				<>
+					<div className='absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-6 z-10'>
+						<motion.button
+							onClick={goToPreviousWeek}
+							className='p-3 rounded-full bg-white shadow-lg text-indigo-600 hover:text-indigo-800 border border-indigo-100'
+							whileHover={{ scale: 1.1, x: -2 }}
+							whileTap={{ scale: 0.95 }}>
+							<ChevronLeft className='h-5 w-5' />
+						</motion.button>
+					</div>
 
-						<div className='absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-6 z-10'>
-							<motion.button
-								onClick={goToNextWeek}
-								className='p-3 rounded-full bg-white shadow-lg text-indigo-600 hover:text-indigo-800 border border-indigo-100'
-								whileHover={{ scale: 1.1, x: 2 }}
-								whileTap={{ scale: 0.95 }}>
-								<ChevronRight className='h-5 w-5' />
-							</motion.button>
-						</div>
-					</>
-				)}
+					<div className='absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-6 z-10'>
+						<motion.button
+							onClick={goToNextWeek}
+							className='p-3 rounded-full bg-white shadow-lg text-indigo-600 hover:text-indigo-800 border border-indigo-100'
+							whileHover={{ scale: 1.1, x: 2 }}
+							whileTap={{ scale: 0.95 }}>
+							<ChevronRight className='h-5 w-5' />
+						</motion.button>
+					</div>
+				</>
 
 				{/* Conteneur des jours avec padding pour les flèches (ajustement pour mobile) */}
 				<div
@@ -198,7 +168,6 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 									relative flex flex-col items-center
 									${isToday ? 'z-10' : ''}
 									min-w-[80px] mx-2 md:mx-2 
-									${isMobile ? 'flex-1' : ''}
 								`}>
 								{/* Jour du mois */}
 								<div

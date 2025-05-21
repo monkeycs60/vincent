@@ -31,7 +31,7 @@ export default async function Home() {
 			{/* Section Galerie */}
 			<section
 				id='gallery'
-				className='w-full py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto'>
+				className='w-full py-4 md:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto'>
 				<div className='mb-10 text-center'>
 					<h2 className='text-2xl md:text-3xl font-bold mb-3 text-gray-900'>
 						La Collection Vincent
