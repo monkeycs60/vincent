@@ -117,8 +117,8 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 							<div className='flex items-start gap-3'>
 								<span className='text-2xl'>🗣️</span>
 								<div>
-									<h2 className='text-xl font-bold text-gray-800 mb-1'>
-										&quot;{latestImage.title}&quot;
+									<h2 className='text-xl font-bold italic text-gray-800 mb-1'>
+										{latestImage.title}
 									</h2>
 									<p className='text-gray-500 text-xs flex items-center gap-1'>
 										<Calendar className='h-3 w-3' />

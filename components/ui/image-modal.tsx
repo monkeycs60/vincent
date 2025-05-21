@@ -60,22 +60,21 @@ export default function ImageModal({
 						exit={{ scale: 0.9, opacity: 0 }}
 						transition={{ type: 'spring', damping: 25 }}
 						className='relative bg-white p-2 rounded-xl max-w-4xl mx-auto flex flex-col items-center justify-center'
-						onClick={(e) => e.stopPropagation()}
-					>
+						onClick={(e) => e.stopPropagation()}>
 						{/* Bouton de fermeture */}
 						<button
 							onClick={onClose}
-							className='absolute top-3 right-3 z-10 bg-black/70 text-white p-2 rounded-full hover:bg-black transition-colors'>
+							className='absolute top-3 cursor-pointer right-3 z-10 bg-black/70 text-white p-2 rounded-full hover:bg-black transition-colors'>
 							<X size={20} />
 						</button>
 
 						{/* Image */}
-						<div className='relative w-[700px] h-[600px] mt-4 rounded-xl'>
+						<div className='relative w-[700px] h-[600px] mt-4 rounded-xl overflow-hidden'>
 							<Image
 								src={image.url}
 								alt={image.title || 'Image Vincent'}
 								fill
-								className='object-contain rounded-xl'
+								className='object-contain'
 								priority
 							/>
 						</div>
