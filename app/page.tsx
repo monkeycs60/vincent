@@ -24,10 +24,10 @@ export default async function Home() {
 				id='gallery'
 				className='w-full py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto'>
 				<div className='mb-10 text-center'>
-					<h2 className='text-3xl md:text-4xl font-bold mb-3 text-gray-900'>
+					<h2 className='text-2xl md:text-3xl font-bold mb-3 text-gray-900'>
 						La Collection Vincent
 					</h2>
-					<p className='text-lg text-gray-600 max-w-2xl mx-auto'>
+					<p className='text-gray-600 max-w-2xl mx-auto'>
 						Pendant que vous vous tourniez les pouces, l&apos;IA ne vous a
 						pas attendu pour capturer chaque jour la substantifique moelle
 						de Vincent.

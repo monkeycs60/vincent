@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Image as ImageType } from '@/app/generated/prisma/index';
 import { motion } from 'framer-motion';
@@ -28,6 +28,25 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 	const [modalImage, setModalImage] = useState<ImageType | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+	const [isMobile, setIsMobile] = useState(false);
+
+	const timelineRef = useRef<HTMLDivElement>(null);
+	const touchStartX = useRef(0);
+	const scrollStartX = useRef(0);
+
+	// Détecter si on est sur mobile
+	useEffect(() => {
+		const checkIfMobile = () => {
+			setIsMobile(window.innerWidth < 768);
+		};
+
+		checkIfMobile();
+		window.addEventListener('resize', checkIfMobile);
+
+		return () => {
+			window.removeEventListener('resize', checkIfMobile);
+		};
+	}, []);
 
 	// Gestionnaire d'événements de souris global
 	useEffect(() => {
@@ -42,10 +61,15 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 		};
 	}, []);
 
-	// Fonction pour obtenir les jours de la semaine actuelle
+	// Fonction pour obtenir les jours de la semaine actuelle, limités à 3 sur mobile
 	const getWeekDays = () => {
 		const days = [];
-		for (let i = 0; i < 7; i++) {
+		const daysToShow = isMobile ? 3 : 7;
+
+		// Sur mobile, afficher les 3 derniers jours (aujourd'hui et les 2 précédents)
+		const startIndex = isMobile ? 4 : 0;
+
+		for (let i = startIndex; i < startIndex + daysToShow; i++) {
 			const day = new Date(currentWeekStart);
 			day.setDate(currentWeekStart.getDate() + i);
 			days.push(day);
@@ -97,6 +121,20 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 		setIsModalOpen(false);
 	};
 
+	// Gestionnaires d'événements tactiles pour le défilement sur mobile
+	const handleTouchStart = (e: React.TouchEvent) => {
+		if (!timelineRef.current) return;
+		touchStartX.current = e.touches[0].clientX;
+		scrollStartX.current = timelineRef.current.scrollLeft;
+	};
+
+	const handleTouchMove = (e: React.TouchEvent) => {
+		if (!timelineRef.current) return;
+		const touchX = e.touches[0].clientX;
+		const diffX = touchStartX.current - touchX;
+		timelineRef.current.scrollLeft = scrollStartX.current + diffX;
+	};
+
 	// Noms courts des jours de la semaine
 	const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
@@ -104,8 +142,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 		<div className='w-full max-w-6xl mx-auto my-12 px-4'>
 			{/* Titre centré */}
 			<h2 className='text-2xl md:text-3xl font-bold text-center mb-8 flex items-center justify-center gap-2'>
-				<Calendar className='h-6 w-6 text-indigo-600' />
-				<span>Vincent Timeline</span>
+				<span>La semaine de Vincent</span>
 			</h2>
 
 			{/* Timeline artistique */}
@@ -113,36 +150,58 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 				{/* Ligne de temps */}
 				<div className='absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-200 via-purple-300 to-pink-200 transform -translate-y-1/2 z-0'></div>
 
-				{/* Flèche gauche */}
-				<div className='absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-6 z-10'>
-					<motion.button
-						onClick={goToPreviousWeek}
-						className='p-3 rounded-full bg-white shadow-lg text-indigo-600 hover:text-indigo-800 border border-indigo-100'
-						whileHover={{ scale: 1.1, x: -2 }}
-						whileTap={{ scale: 0.95 }}>
-						<ChevronLeft className='h-5 w-5' />
-					</motion.button>
-				</div>
+				{/* Flèches de navigation (visibles uniquement sur desktop) */}
+				{!isMobile && (
+					<>
+						<div className='absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-6 z-10'>
+							<motion.button
+								onClick={goToPreviousWeek}
+								className='p-3 rounded-full bg-white shadow-lg text-indigo-600 hover:text-indigo-800 border border-indigo-100'
+								whileHover={{ scale: 1.1, x: -2 }}
+								whileTap={{ scale: 0.95 }}>
+								<ChevronLeft className='h-5 w-5' />
+							</motion.button>
+						</div>
 
-				{/* Flèche droite */}
-				<div className='absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-6 z-10'>
-					<motion.button
-						onClick={goToNextWeek}
-						className='p-3 rounded-full bg-white shadow-lg text-indigo-600 hover:text-indigo-800 border border-indigo-100'
-						whileHover={{ scale: 1.1, x: 2 }}
-						whileTap={{ scale: 0.95 }}>
-						<ChevronRight className='h-5 w-5' />
-					</motion.button>
-				</div>
+						<div className='absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-6 z-10'>
+							<motion.button
+								onClick={goToNextWeek}
+								className='p-3 rounded-full bg-white shadow-lg text-indigo-600 hover:text-indigo-800 border border-indigo-100'
+								whileHover={{ scale: 1.1, x: 2 }}
+								whileTap={{ scale: 0.95 }}>
+								<ChevronRight className='h-5 w-5' />
+							</motion.button>
+						</div>
+					</>
+				)}
 
-				{/* Conteneur des jours avec padding pour les flèches */}
-				<div className='flex justify-between items-end px-10 py-6 overflow-x-auto'>
-					{weekDays.map((date, index) => {
+				{/* Conteneur des jours avec padding pour les flèches (ajustement pour mobile) */}
+				<div
+					ref={timelineRef}
+					className='flex justify-between items-end md:px-10 py-6 overflow-x-auto md:overflow-x-hidden scrollbar-hide'
+					style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+					onTouchStart={handleTouchStart}
+					onTouchMove={handleTouchMove}>
+					<style jsx global>{`
+						/* Cacher la scrollbar pour Chrome, Safari et Opera */
+						.scrollbar-hide::-webkit-scrollbar {
+							display: none;
+						}
+						/* Cacher la scrollbar pour IE, Edge et Firefox */
+						.scrollbar-hide {
+							-ms-overflow-style: none; /* IE et Edge */
+							scrollbar-width: none; /* Firefox */
+						}
+					`}</style>
+
+					{weekDays.map((date) => {
 						const image = getImageForDate(date);
 						const isToday =
 							formatDateForComparison(date) ===
 							formatDateForComparison(new Date());
-						const dayName = dayNames[index];
+						const dayNameIndex =
+							date.getDay() === 0 ? 6 : date.getDay() - 1;
+						const dayName = dayNames[dayNameIndex];
 
 						return (
 							<div
@@ -150,7 +209,8 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 								className={`
 									relative flex flex-col items-center
 									${isToday ? 'z-10' : ''}
-									min-w-[80px] mx-1 md:mx-2
+									min-w-[80px] mx-2 md:mx-2 
+									${isMobile ? 'flex-1' : ''}
 								`}>
 								{/* Jour du mois */}
 								<div
@@ -173,7 +233,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 								{/* Image du jour */}
 								<div
 									className={`
-										relative w-16 h-24 md:w-20 md:h-28 rounded-xl overflow-hidden shadow-md 
+										relative w-20 h-28 md:w-20 md:h-28 rounded-xl overflow-hidden shadow-md 
 										${image ? 'cursor-pointer' : 'bg-gray-100 opacity-40'}
 										${
 											isToday
