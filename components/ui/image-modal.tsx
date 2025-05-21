@@ -59,7 +59,7 @@ export default function ImageModal({
 						animate={{ scale: 1, opacity: 1 }}
 						exit={{ scale: 0.9, opacity: 0 }}
 						transition={{ type: 'spring', damping: 25 }}
-						className='relative bg-white p-2 rounded-xl md:max-w-4xl mx-auto flex flex-col items-center justify-center'
+						className='relative bg-white p-2 rounded-xl w-[95%] max-w-md md:max-w-4xl mx-auto flex flex-col items-center justify-center'
 						onClick={(e) => e.stopPropagation()}>
 						{/* Bouton de fermeture */}
 						<button
@@ -69,7 +69,7 @@ export default function ImageModal({
 						</button>
 
 						{/* Image */}
-						<div className='relative w-[700px] h-[600px] mt-4 rounded-xl overflow-hidden'>
+						<div className='relative w-full h-[350px] md:w-[700px] md:h-[600px] mt-4 rounded-xl overflow-hidden'>
 							<Image
 								src={image.url}
 								alt={image.title || 'Image Vincent'}
@@ -81,7 +81,9 @@ export default function ImageModal({
 
 						{/* Titre et date */}
 						<div className='p-4 text-center'>
-							<h3 className='text-xl font-bold italic'>{image.title}</h3>
+							<h3 className='text-lg md:text-xl font-bold italic'>
+								{image.title}
+							</h3>
 							<p className='text-gray-500 text-sm mt-1'>
 								Généré le{' '}
 								{new Date(image.createdAt).toLocaleDateString()}
