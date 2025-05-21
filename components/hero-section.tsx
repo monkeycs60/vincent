@@ -164,8 +164,25 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ delay: 0.7, duration: 0.6 }}>
 							<Link
-								href='#gallery'
+								href='#calendar'
 								className='bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-5 rounded-lg text-center shadow-lg transition-all flex items-center justify-center gap-2 group text-sm sm:w-1/2'
+								onClick={(e) => {
+									e.preventDefault();
+									const calendar = document.getElementById('calendar');
+									if (calendar) {
+										calendar.scrollIntoView({
+											behavior: 'smooth',
+											block: 'start',
+										});
+									}
+								}}>
+								<Calendar className='w-4 h-4' />
+								<span>Voir la timeline</span>
+								<ArrowRight className='w-0 h-4 opacity-0 group-hover:w-4 group-hover:opacity-100 transition-all duration-300' />
+							</Link>
+							<Link
+								href='#gallery'
+								className='bg-gradient-to-r from-pink-500 to-fuchsia-500 hover:from-pink-600 hover:to-fuchsia-600 text-white font-bold py-3 px-5 rounded-lg text-center shadow-lg transition-all flex items-center justify-center gap-2 group text-sm sm:w-1/2'
 								onClick={(e) => {
 									e.preventDefault();
 									const gallery = document.getElementById('gallery');
