@@ -41,6 +41,13 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 		<section className='relative w-full py-4 overflow-hidden max-w-7xl mx-auto'>
 			<div className='container mx-auto px-4 relative z-10'>
 				<div className='flex flex-col md:flex-row md:items-center gap-8 md:gap-12 md:mx-auto md:justify-between'>
+					<motion.h1
+						className='text-3xl md:text-4xl md:hidden lg:text-6xl font-extrabold text-left leading-tight bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 text-transparent bg-clip-text'
+						initial={{ opacity: 0, x: 20 }}
+						animate={{ opacity: 1, x: 0 }}
+						transition={{ duration: 0.7 }}>
+						Chaque jour, une IA torture Vincent.
+					</motion.h1>
 					{/* Image à gauche avec dimensions réduites */}
 					<motion.div
 						className='md:w-auto md:flex-shrink-0'
@@ -74,10 +81,10 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 					</motion.div>
 
 					{/* Contenu à droite */}
-					<div className='w-1/2 flex flex-col justify-center space-y-6'>
+					<div className='md:w-1/2 flex flex-col justify-center space-y-6'>
 						{/* Titre principal avec effet de gradient */}
 						<motion.h1
-							className='text-3xl md:text-4xl lg:text-6xl font-extrabold text-left leading-tight bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 text-transparent bg-clip-text'
+							className='max-md:hidden text-3xl md:text-4xl lg:text-6xl font-extrabold text-left leading-tight bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 text-transparent bg-clip-text'
 							initial={{ opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ duration: 0.7 }}>
