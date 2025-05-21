@@ -26,7 +26,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang='fr'>
+		<html lang='fr' className='scroll-smooth'>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} bg-gradient-to-b from-pink-50 via-indigo-50 to-purple-50`}>
 				<header className='py-4 px-6 text-black'>

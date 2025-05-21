@@ -145,7 +145,17 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 							transition={{ delay: 0.7, duration: 0.6 }}>
 							<Link
 								href='#gallery'
-								className='bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-5 rounded-lg text-center shadow-lg transition-all flex items-center justify-center gap-2 group text-sm md:w-2/3 mx-auto'>
+								className='bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-5 rounded-lg text-center shadow-lg transition-all flex items-center justify-center gap-2 group text-sm md:w-2/3 mx-auto'
+								onClick={(e) => {
+									e.preventDefault();
+									const gallery = document.getElementById('gallery');
+									if (gallery) {
+										gallery.scrollIntoView({
+											behavior: 'smooth',
+											block: 'start',
+										});
+									}
+								}}>
 								<Grid2X2 className='w-4 h-4' />
 								<span>Explorer la galerie</span>
 								<ArrowRight className='w-0 h-4 opacity-0 group-hover:w-4 group-hover:opacity-100 transition-all duration-300' />
