@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { Image as ImageType } from '@/app/generated/prisma/index';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import ImageModal from './image-modal';
 
@@ -25,6 +25,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 
 	// États pour l'image survolée et la modale
 	const [hoveredImage, setHoveredImage] = useState<ImageType | null>(null);
+	const [hoveredPosition, setHoveredPosition] = useState({ x: 0, y: 0 });
 	const [modalImage, setModalImage] = useState<ImageType | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -83,48 +84,38 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 		setIsModalOpen(false);
 	};
 
+	// Fonction pour gérer le survol d'une image avec position
+	const handleMouseEnter = (image: ImageType, e: React.MouseEvent) => {
+		setHoveredImage(image);
+		setHoveredPosition({ x: e.clientX, y: e.clientY });
+	};
+
+	const handleMouseMove = (e: React.MouseEvent) => {
+		if (hoveredImage) {
+			setHoveredPosition({ x: e.clientX, y: e.clientY });
+		}
+	};
+
+	const handleMouseLeave = () => {
+		setHoveredImage(null);
+	};
+
 	// Noms courts des jours de la semaine
 	const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
-	// Mois actuellement affiché (pour l'en-tête)
-	const currentMonthYear = new Intl.DateTimeFormat('fr-FR', {
-		month: 'long',
-		year: 'numeric',
-	}).format(weekDays[3]); // Milieu de la semaine pour déterminer le mois principal
-
 	return (
 		<div className='w-full max-w-6xl mx-auto my-12 px-4'>
-			<div className='flex items-center justify-between mb-6'>
-				<h2 className='text-2xl md:text-3xl font-bold flex items-center gap-2'>
-					<Calendar className='h-6 w-6 text-indigo-600' />
-					<span>La Semaine de Vincent</span>
-				</h2>
-				<div className='flex items-center gap-2'>
-					<motion.button
-						onClick={goToPreviousWeek}
-						className='p-2 rounded-full bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors'
-						whileHover={{ scale: 1.1 }}
-						whileTap={{ scale: 0.95 }}>
-						<ChevronLeft className='h-5 w-5' />
-					</motion.button>
-					<span className='font-medium text-gray-700 min-w-32 text-center'>
-						{currentMonthYear}
-					</span>
-					<motion.button
-						onClick={goToNextWeek}
-						className='p-2 rounded-full bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors'
-						whileHover={{ scale: 1.1 }}
-						whileTap={{ scale: 0.95 }}>
-						<ChevronRight className='h-5 w-5' />
-					</motion.button>
-				</div>
-			</div>
+			{/* Titre centré */}
+			<h2 className='text-2xl md:text-3xl font-bold text-center mb-8 flex items-center justify-center gap-2'>
+				<Calendar className='h-6 w-6 text-indigo-600' />
+				<span>Vincent Timeline</span>
+			</h2>
 
 			{/* Timeline artistique */}
 			<div className='relative'>
 				{/* Ligne de temps */}
 				<div className='absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-200 via-purple-300 to-pink-200 transform -translate-y-1/2 z-0'></div>
-
+				
 				{/* Flèche gauche */}
 				<div className='absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-6 z-10'>
 					<motion.button
@@ -135,7 +126,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 						<ChevronLeft className='h-5 w-5' />
 					</motion.button>
 				</div>
-
+				
 				{/* Flèche droite */}
 				<div className='absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-6 z-10'>
 					<motion.button
@@ -146,7 +137,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 						<ChevronRight className='h-5 w-5' />
 					</motion.button>
 				</div>
-
+				
 				{/* Conteneur des jours avec padding pour les flèches */}
 				<div className='flex justify-between items-end px-10 py-6 overflow-x-auto'>
 					{weekDays.map((date, index) => {
@@ -157,86 +148,98 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 						const dayName = dayNames[index];
 
 						return (
-							<motion.div
+							<div
 								key={`day-${date.toISOString()}`}
 								className={`
-									relative flex flex-col items-center group
-									${isToday ? 'scale-110 z-10' : ''}
+									relative flex flex-col items-center
+									${isToday ? 'z-10' : ''}
 									min-w-[80px] mx-1 md:mx-2
 								`}
-								whileHover={
-									image
-										? { scale: 1.2, zIndex: 20 }
-										: { scale: 1.05, zIndex: 20 }
-								}
-								transition={{
-									type: 'spring',
-									stiffness: 300,
-									damping: 20,
-								}}>
+								onMouseEnter={(e) => image && handleMouseEnter(image, e)}
+								onMouseMove={handleMouseMove}
+								onMouseLeave={handleMouseLeave}>
+								
 								{/* Jour du mois */}
-								<div
-									className={`
+								<div className={`
 									mb-2 font-bold text-lg rounded-full w-10 h-10 flex items-center justify-center
-									${
-										isToday
-											? 'bg-indigo-600 text-white shadow-md shadow-indigo-300'
-											: 'bg-white text-gray-700 border border-gray-200'
-									}
+									${isToday 
+										? 'bg-indigo-600 text-white shadow-md shadow-indigo-300' 
+										: 'bg-white text-gray-700 border border-gray-200'}
 								`}>
 									{date.getDate()}
 								</div>
-
+								
 								{/* Jour de la semaine */}
-								<div className='text-xs text-gray-500 mb-2'>
-									{dayName}
-								</div>
-
+								<div className='text-xs text-gray-500 mb-2'>{dayName}</div>
+								
 								{/* Image du jour */}
-								<motion.div
+								<div
 									className={`
 										relative w-16 h-24 md:w-20 md:h-28 rounded-xl overflow-hidden shadow-md 
 										${image ? 'cursor-pointer' : 'bg-gray-100 opacity-40'}
-										${
-											isToday
-												? 'shadow-lg shadow-purple-200 border-2 border-indigo-400'
-												: 'border border-gray-200'
-										}
+										${isToday ? 'shadow-lg shadow-purple-200 border-2 border-indigo-400' : 'border border-gray-200'}
 									`}
-									transition={{ duration: 0.2 }}
 									onClick={() => image && openModal(image)}>
 									{image ? (
 										<Image
 											src={image.url}
-											alt={
-												image.title ||
-												`Vincent du ${date.toLocaleDateString()}`
-											}
+											alt={image.title || `Vincent du ${date.toLocaleDateString()}`}
 											fill
-											className='object-cover transition-transform duration-300 group-hover:scale-105'
+											className='object-cover'
 											sizes='(max-width: 768px) 80px, 100px'
 										/>
 									) : (
 										<div className='h-full w-full flex items-center justify-center'>
-											<span className='text-gray-400 text-xs text-center px-1'>
-												Pas d&apos;image
-											</span>
+											<span className='text-gray-400 text-xs text-center px-1'>Pas d&apos;image</span>
 										</div>
 									)}
-								</motion.div>
-
+								</div>
+								
 								{/* Point sur la timeline */}
-								<div
-									className={`
+								<div className={`
 									w-3 h-3 rounded-full mt-4
 									${image ? 'bg-indigo-600' : 'bg-gray-300'}
 									${isToday ? 'w-4 h-4 mt-3.5' : ''}
 								`}></div>
-							</motion.div>
+							</div>
 						);
 					})}
 				</div>
 			</div>
+
+			{/* Image agrandie au survol */}
+			{hoveredImage && (
+				<motion.div 
+					initial={{ opacity: 0, scale: 0.8 }}
+					animate={{ 
+						opacity: 1, 
+						scale: 1,
+						x: hoveredPosition.x < window.innerWidth / 2 
+							? hoveredPosition.x + 20 
+							: hoveredPosition.x - 220,
+						y: hoveredPosition.y < window.innerHeight / 2 
+							? hoveredPosition.y + 20 
+							: hoveredPosition.y - 300
+					}}
+					className='fixed z-50 bg-white rounded-xl shadow-xl overflow-hidden w-60'
+					style={{ pointerEvents: 'none' }}>
+					<div className='relative w-60 h-80'>
+						<Image
+							src={hoveredImage.url}
+							alt={hoveredImage.title || 'Image Vincent'}
+							fill
+							className='object-cover'
+							priority
+						/>
+					</div>
+					<div className='p-3 bg-white'>
+						<p className='font-bold italic text-sm'>{hoveredImage.title}</p>
+						<p className='text-xs text-gray-500 mt-1'>
+							{new Date(hoveredImage.createdAt).toLocaleDateString()}
+						</p>
+					</div>
+				</motion.div>
+			)}
 
 			{/* Modale pour l'image en plein écran */}
 			<ImageModal
