@@ -1,18 +1,30 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Image as ImageType } from '@/app/generated/prisma/index';
 import { motion } from 'framer-motion';
 import { Grid2X2, Calendar, Heart, ArrowRight } from 'lucide-react';
+import ImageModal from './ui/image-modal';
 
 interface HeroSectionProps {
 	latestImage: ImageType | null;
 }
 
 export default function HeroSection({ latestImage }: HeroSectionProps) {
-	// Si aucune image n'existe encore
+	const [isModalOpen, setIsModalOpen] = useState(false);
+
+	const openModal = () => {
+		if (latestImage) {
+			setIsModalOpen(true);
+		}
+	};
+
+	const closeModal = () => {
+		setIsModalOpen(false);
+	};
+
 	if (!latestImage) {
 		return (
 			<div className='min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-pink-100 via-purple-100 to-indigo-100 text-center px-4'>
@@ -50,12 +62,13 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 					</motion.h1>
 					{/* Image à gauche avec dimensions réduites */}
 					<motion.div
-						className='md:w-auto md:flex-shrink-0'
+						className='md:w-auto md:flex-shrink-0 cursor-pointer'
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8 }}
 						whileHover={{ scale: 1.02, rotate: 1 }}
-						whileTap={{ scale: 0.98 }}>
+						whileTap={{ scale: 0.98 }}
+						onClick={openModal}>
 						<div className='relative w-full aspect-[2/3] md:h-[600px] rounded-2xl overflow-hidden border-6 border-white'>
 							<Image
 								src={latestImage.url}
@@ -171,6 +184,13 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 					</div>
 				</div>
 			</div>
+
+			{/* Modale pour l'image */}
+			<ImageModal
+				isOpen={isModalOpen}
+				image={latestImage}
+				onClose={closeModal}
+			/>
 		</section>
 	);
 }
