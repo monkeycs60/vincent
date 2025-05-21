@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Image as ImageType } from '@/app/generated/prisma/index';
 import { motion } from 'framer-motion';
+import { Calendar } from 'lucide-react';
 
 interface GridGalleryProps {
 	images: ImageType[];
@@ -34,33 +35,36 @@ export default function GridGallery({ images }: GridGalleryProps) {
 	}
 
 	return (
-		<div className='w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 masonry-grid'>
+		<div className='w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8'>
 			{images.map((image, index) => (
 				<motion.div
 					key={image.id}
-					className='relative mb-4 group overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300'
+					className='relative mb-4 group overflow-hidden rounded-xl'
 					variants={itemVariants}
 					initial='hidden'
 					animate='visible'
 					custom={index}
-					whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}>
-					<div className='relative aspect-square'>
+					whileHover={{
+						scale: 1.03,
+						transition: { duration: 0.2 },
+						boxShadow:
+							'0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+					}}>
+					<div className='relative aspect-[2/3] overflow-hidden border-4 border-white'>
 						<Image
 							src={image.url}
 							alt={image.title}
 							fill
-							className='object-cover transition-transform duration-500 group-hover:scale-105'
+							className='object-cover rounded-xl transition-transform duration-500 group-hover:scale-105'
 							sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
 						/>
 					</div>
-					<div className='absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent'>
-						<p className='text-white font-semibold text-xs md:text-sm mb-1'>
-							{image.title || 'Vincent du jour'}
-						</p>
+					<div className='absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/50 to-transparent'>
 						<p className='text-white font-bold italic text-sm md:text-base'>
-							&quot;{image.title}&quot;
+							{image.title}
 						</p>
-						<p className='text-white/70 text-xs mt-1'>
+						<p className='text-white/70 text-xs mt-1 flex items-center gap-1'>
+							<Calendar className='h-3 w-3' />
 							{new Date(image.createdAt).toLocaleDateString()}
 						</p>
 					</div>
