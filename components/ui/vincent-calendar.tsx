@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Image as ImageType } from '@/app/generated/prisma/index';
-import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import ImageModal from './image-modal';
 
 interface VincentCalendarProps {
@@ -12,8 +11,8 @@ interface VincentCalendarProps {
 }
 
 export default function VincentCalendar({ images }: VincentCalendarProps) {
-	// État pour le premier jour de la semaine affichée
-	const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => {
+	// État pour le premier jour de la semaine affichée - on se concentre uniquement sur la semaine actuelle
+	const [currentWeekStart] = useState<Date>(() => {
 		const now = new Date();
 		const dayOfWeek = now.getDay();
 		const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Lundi comme premier jour (0 = dimanche en JS)
@@ -23,57 +22,32 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 		return monday;
 	});
 
-	// États pour l'image survolée et la modale
-	const [hoveredImage, setHoveredImage] = useState<ImageType | null>(null);
+	// États pour la navigation et la modale
+	const [activeIndex, setActiveIndex] = useState(0);
+	const [direction, setDirection] = useState(0); // -1: vers le passé, 1: vers le futur
+	const [autoplayEnabled, setAutoplayEnabled] = useState(true);
 	const [modalImage, setModalImage] = useState<ImageType | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-	const timelineRef = useRef<HTMLDivElement>(null);
+	const autoplayIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-	// Gestionnaire d'événements de souris global
-	useEffect(() => {
-		const handleMouseMove = (e: MouseEvent) => {
-			setMousePosition({ x: e.clientX, y: e.clientY });
-		};
-
-		window.addEventListener('mousemove', handleMouseMove);
-
-		return () => {
-			window.removeEventListener('mousemove', handleMouseMove);
-		};
-	}, []);
-
-	// Fonction pour obtenir les jours de la semaine actuelle, limités à 3 sur mobile
-	const getWeekDays = () => {
+	// Fonction pour obtenir les jours de la semaine jusqu'à aujourd'hui
+	const getWeekDaysUntilToday = () => {
 		const days = [];
+		const today = new Date();
+		const todayIndex = today.getDay() === 0 ? 6 : today.getDay() - 1;
 
-		// Sur desktop, afficher les 7 jours de la semaine
-		for (let i = 0; i < 7; i++) {
+		// N'ajouter que les jours jusqu'à aujourd'hui (inclus)
+		for (let i = 0; i <= todayIndex; i++) {
 			const day = new Date(currentWeekStart);
 			day.setDate(currentWeekStart.getDate() + i);
 			days.push(day);
 		}
-
 		return days;
 	};
 
-	// Semaine actuelle
-	const weekDays = getWeekDays();
-
-	// Fonction pour naviguer vers la semaine précédente
-	const goToPreviousWeek = () => {
-		const newStart = new Date(currentWeekStart);
-		newStart.setDate(currentWeekStart.getDate() - 7);
-		setCurrentWeekStart(newStart);
-	};
-
-	// Fonction pour naviguer vers la semaine suivante
-	const goToNextWeek = () => {
-		const newStart = new Date(currentWeekStart);
-		newStart.setDate(currentWeekStart.getDate() + 7);
-		setCurrentWeekStart(newStart);
-	};
+	// Jours de la semaine jusqu'à aujourd'hui
+	const weekDays = getWeekDaysUntilToday();
 
 	// Fonction pour formater la date en YYYY-MM-DD pour la comparaison
 	const formatDateForComparison = (date: Date): string => {
@@ -82,17 +56,25 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 
 	// Fonction pour vérifier si une image existe pour une date donnée
 	const getImageForDate = (date: Date): ImageType | null => {
-		const dateStr = formatDateForComparison(date);
-		return (
-			images.find(
-				(img) =>
-					formatDateForComparison(new Date(img.createdAt)) === dateStr
-			) || null
-		);
+		// Trouver une image dont la date de création correspond exactement à la date donnée
+		const matchedImage = images.find((img) => {
+			const imgDate = new Date(img.createdAt);
+			// Créer une date locale sans fuseau horaire pour une comparaison précise
+			const imgDateStr = `${imgDate.getFullYear()}-${String(
+				imgDate.getMonth() + 1
+			).padStart(2, '0')}-${String(imgDate.getDate()).padStart(2, '0')}`;
+			const targetDateStr = `${date.getFullYear()}-${String(
+				date.getMonth() + 1
+			).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+			return imgDateStr === targetDateStr;
+		});
+
+		return matchedImage || null;
 	};
 
 	// Fonction pour ouvrir la modale avec l'image sélectionnée
 	const openModal = (image: ImageType) => {
+		setAutoplayEnabled(false);
 		setModalImage(image);
 		setIsModalOpen(true);
 	};
@@ -100,59 +82,94 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 	// Fonction pour fermer la modale
 	const closeModal = () => {
 		setIsModalOpen(false);
+		setAutoplayEnabled(true);
 	};
 
-	// Noms courts des jours de la semaine
-	const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+	// Fonction pour aller à l'image suivante (vers le jour plus récent)
+	const goToNext = () => {
+		setDirection(1); // Direction vers le futur/droit
+		setActiveIndex((prevIndex) => (prevIndex + 1) % weekDays.length);
+	};
+
+	// Fonction pour aller à l'image précédente (vers le jour plus ancien)
+	const goToPrevious = () => {
+		setDirection(-1); // Direction vers le passé/gauche
+		setActiveIndex(
+			(prevIndex) => (prevIndex - 1 + weekDays.length) % weekDays.length
+		);
+	};
+
+	// Autoplay
+	useEffect(() => {
+		if (autoplayEnabled && weekDays.length > 1) {
+			// Direction alternée pour l'autoplay
+			const autoplayNext = () => {
+				const currentDate = weekDays[activeIndex];
+				const today = new Date();
+
+				// Si on est à la dernière image (aujourd'hui), on revient en arrière
+				if (
+					formatDateForComparison(currentDate) ===
+					formatDateForComparison(today)
+				) {
+					goToPrevious();
+				} else {
+					// Sinon on avance
+					goToNext();
+				}
+			};
+
+			autoplayIntervalRef.current = setInterval(autoplayNext, 5000);
+		}
+		return () => {
+			if (autoplayIntervalRef.current) {
+				clearInterval(autoplayIntervalRef.current);
+			}
+		};
+	}, [autoplayEnabled, weekDays.length, activeIndex]);
+
+	// Noms des jours de la semaine
+	const dayNames = [
+		'Lundi',
+		'Mardi',
+		'Mercredi',
+		'Jeudi',
+		'Vendredi',
+		'Samedi',
+		'Dimanche',
+	];
+
+	// Variantes d'animation basées sur la direction
+	const variants = {
+		enter: (direction: number) => ({
+			x: direction > 0 ? 300 : -300,
+			opacity: 0,
+		}),
+		center: {
+			x: 0,
+			opacity: 1,
+		},
+		exit: (direction: number) => ({
+			x: direction < 0 ? 300 : -300,
+			opacity: 0,
+		}),
+	};
 
 	return (
-		<div className='w-full max-w-6xl mx-auto my-12 md:my-20 px-4'>
-			{/* Titre centré */}
-			<h2 className='text-2xl md:text-3xl font-bold text-center mb-8 flex items-center justify-center gap-2'>
-				<span>La semaine de Vincent</span>
+		<div className='w-full max-w-4xl mx-auto my-6 md:my-10 px-2'>
+			{/* Titre centré avec style minimaliste */}
+			<h2 className='text-xl md:text-2xl font-semibold text-center mb-4 text-gray-800'>
+				<span className='inline-block border-b border-indigo-300 pb-1'>
+					La semaine de Vincent
+				</span>
 			</h2>
 
-			{/* Timeline artistique */}
-			<div className='relative'>
-				{/* Ligne de temps */}
-				<div className='absolute top-[140px] md:top-[140px] left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-200 via-purple-300 to-pink-200 z-0'></div>
+			{/* Carrousel minimaliste avec défilement automatique et transition directionnelle */}
+			<div className='relative w-full overflow-hidden min-h-[550px]'>
+				<AnimatePresence initial={false} custom={direction} mode='wait'>
+					{weekDays.map((date, index) => {
+						if (index !== activeIndex) return null;
 
-				{/* Flèches de navigation (visibles uniquement sur desktop) */}
-				<>
-					<div className='absolute left-0 top-[140px] transform -translate-y-1/2 -translate-x-6 z-10'>
-						<motion.button
-							onClick={goToPreviousWeek}
-							className='p-3 rounded-full bg-white shadow-lg text-indigo-600 hover:text-indigo-800 border border-indigo-100'
-							whileHover={{ scale: 1.1, x: -2 }}
-							whileTap={{ scale: 0.95 }}>
-							<ChevronLeft className='h-5 w-5' />
-						</motion.button>
-					</div>
-
-					<div className='absolute right-0 top-[140px] transform -translate-y-1/2 translate-x-6 z-10'>
-						<motion.button
-							onClick={goToNextWeek}
-							className='p-3 rounded-full bg-white shadow-lg text-indigo-600 hover:text-indigo-800 border border-indigo-100'
-							whileHover={{ scale: 1.1, x: 2 }}
-							whileTap={{ scale: 0.95 }}>
-							<ChevronRight className='h-5 w-5' />
-						</motion.button>
-					</div>
-				</>
-
-				{/* Conteneur des jours avec padding pour les flèches (ajustement pour mobile) */}
-				<div
-					ref={timelineRef}
-					className='flex justify-between items-start md:px-10 py-6 overflow-x-auto md:overflow-visible'
-					style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-					<style jsx global>{`
-						/* Cacher la scrollbar pour Chrome, Safari et Opera */
-						div::-webkit-scrollbar {
-							display: none;
-						}
-					`}</style>
-
-					{weekDays.map((date) => {
 						const image = getImageForDate(date);
 						const isToday =
 							formatDateForComparison(date) ===
@@ -162,113 +179,82 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 						const dayName = dayNames[dayNameIndex];
 
 						return (
-							<div
+							<motion.div
 								key={`day-${date.toISOString()}`}
-								className={`
-									relative flex flex-col items-center
-									${isToday ? 'z-10' : ''}
-									min-w-[80px] mx-2 md:mx-2 
-								`}>
-								{/* Jour du mois */}
-								<div
-									className={`
-									mb-2 font-bold text-lg rounded-full w-10 h-10 flex items-center justify-center
-									${
-										isToday
-											? 'bg-indigo-600 text-white shadow-md shadow-indigo-300'
-											: 'bg-white text-gray-700 border border-gray-200'
-									}
-								`}>
-									{date.getDate()}
+								custom={direction}
+								variants={variants}
+								initial='enter'
+								animate='center'
+								exit='exit'
+								transition={{
+									duration: 0.5,
+									ease: 'easeInOut',
+								}}
+								className='absolute w-full'>
+								{/* Informations minimales sur la date */}
+								<div className='text-center mb-3'>
+									<div
+										className={`font-medium text-sm md:text-base ${
+											isToday ? 'text-indigo-600' : 'text-gray-600'
+										}`}>
+										{dayName} {date.getDate()}{' '}
+										{date.toLocaleDateString('fr-FR', {
+											month: 'long',
+										})}
+									</div>
 								</div>
 
-								{/* Jour de la semaine */}
-								<div className='text-xs text-gray-500 mb-2'>
-									{dayName}
-								</div>
+								{/* Layout flexible pour l'image et la légende */}
+								<div className='flex flex-col md:flex-row md:items-start md:gap-4 md:justify-center'>
+									{/* Image un peu plus haute */}
+									<div
+										className={`
+											relative w-full max-w-sm mx-auto md:mx-0 overflow-hidden rounded-md
+											${image ? 'cursor-pointer shadow-sm border border-gray-100' : 'bg-gray-50'}
+										`}
+										style={{ aspectRatio: '2/3', maxHeight: '480px' }}
+										onClick={() => image && openModal(image)}>
+										{image ? (
+											<Image
+												src={image.url}
+												alt={
+													image.title ||
+													`Vincent du ${date.toLocaleDateString()}`
+												}
+												fill
+												className='object-cover'
+												sizes='(max-width: 768px) 100vw, 400px'
+												priority
+											/>
+										) : (
+											<div className='h-full w-full flex items-center justify-center'>
+												<span className='text-gray-400 text-sm font-medium text-center px-2'>
+													Pas d&apos;image pour ce jour
+												</span>
+											</div>
+										)}
+									</div>
 
-								{/* Image du jour */}
-								<div
-									className={`
-										relative w-20 h-28 md:w-20 md:h-28 rounded-xl overflow-hidden shadow-md 
-										${image ? 'cursor-pointer' : 'bg-gray-100 opacity-40'}
-										${
-											isToday
-												? 'shadow-lg shadow-purple-200 border-2 border-indigo-400'
-												: 'border border-gray-200'
-										}
-									`}
-									onClick={() => image && openModal(image)}
-									onMouseEnter={() => image && setHoveredImage(image)}
-									onMouseLeave={() => setHoveredImage(null)}>
-									{image ? (
-										<Image
-											src={image.url}
-											alt={
-												image.title ||
-												`Vincent du ${date.toLocaleDateString()}`
-											}
-											fill
-											className='object-cover'
-											sizes='(max-width: 768px) 80px, 100px'
-										/>
-									) : (
-										<div className='h-full w-full flex items-center justify-center'>
-											<span className='text-gray-400 text-xs text-center px-1'>
-												Pas d&apos;image
-											</span>
+									{/* Légende à droite sur desktop, en dessous sur mobile */}
+									{image && (
+										<div className='mt-2 md:mt-0 md:w-48 text-center md:text-left px-2'>
+											<p className='text-sm md:text-base font-medium italic text-gray-800 mb-1'>
+												{image.title}
+											</p>
+											<p className='text-xs text-gray-500'>
+												Généré le{' '}
+												{new Date(
+													image.createdAt
+												).toLocaleDateString('fr-FR')}
+											</p>
 										</div>
 									)}
 								</div>
-
-								{/* Point sur la timeline */}
-								<div
-									className={`
-									w-3 h-3 rounded-full mt-4 relative top-[-14px]
-									${image ? 'bg-indigo-600' : 'bg-gray-300'}
-									${isToday ? 'w-4 h-4' : ''}
-								`}></div>
-							</div>
+							</motion.div>
 						);
 					})}
-				</div>
+				</AnimatePresence>
 			</div>
-
-			{/* Image agrandie au survol */}
-			{hoveredImage && (
-				<div
-					className='fixed z-[9999] bg-white rounded-xl shadow-xl overflow-hidden'
-					style={{
-						left:
-							mousePosition.x < window.innerWidth / 2
-								? mousePosition.x + 20
-								: mousePosition.x - 280,
-						top:
-							mousePosition.y < window.innerHeight / 2
-								? mousePosition.y + 20
-								: mousePosition.y - 300,
-						width: '260px',
-						pointerEvents: 'none',
-					}}>
-					<div className='relative w-full h-96 rounded-xl w'>
-						<Image
-							src={hoveredImage.url}
-							alt={hoveredImage.title || 'Image Vincent'}
-							fill
-							className='object-cover'
-							priority
-						/>
-					</div>
-					<div className='p-3 bg-white'>
-						<p className='font-bold italic text-sm'>
-							{hoveredImage.title}
-						</p>
-						<p className='text-xs text-gray-500 mt-1'>
-							{new Date(hoveredImage.createdAt).toLocaleDateString()}
-						</p>
-					</div>
-				</div>
-			)}
 
 			{/* Modale pour l'image en plein écran */}
 			<ImageModal
