@@ -106,7 +106,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 	const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
 	return (
-		<div className='w-full max-w-6xl mx-auto my-12 px-4'>
+		<div className='w-full max-w-6xl mx-auto my-12 md:my-20 px-4'>
 			{/* Titre centré */}
 			<h2 className='text-2xl md:text-3xl font-bold text-center mb-8 flex items-center justify-center gap-2'>
 				<span>La semaine de Vincent</span>
