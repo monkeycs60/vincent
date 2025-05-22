@@ -219,7 +219,12 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 											relative w-full max-w-sm mx-auto md:mx-0 overflow-hidden rounded-md
 											${image ? 'cursor-pointer shadow-sm border border-gray-100' : 'bg-gray-50'}
 										`}
-										style={{ aspectRatio: '2/3', maxHeight: '480px' }}
+										style={{
+											aspectRatio: '2/3',
+											height: 'auto',
+											maxHeight: '520px',
+											minHeight: '350px',
+										}}
 										onClick={() => image && openModal(image)}>
 										{image ? (
 											<Image
@@ -244,7 +249,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 
 									{/* Légende à droite sur desktop, en dessous sur mobile - style amélioré et centré verticalement */}
 									{image && (
-										<div className='mt-4 md:mt-0 md:max-w-xs md:flex md:flex-col md:justify-center md:h-[480px] text-center md:text-left px-2'>
+										<div className='mt-4 md:mt-0 md:max-w-xs md:flex md:flex-col md:justify-center md:h-[520px] text-center md:text-left px-2'>
 											<p className='text-base md:text-xl font-bold italic text-gray-800 mb-2 md:mb-3 leading-snug'>
 												{image.title}
 											</p>

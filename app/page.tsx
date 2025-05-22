@@ -2,7 +2,6 @@ import React from 'react';
 import HeroSection from '@/components/hero-section';
 import GridGallery from '@/components/ui/grid-gallery';
 import VincentCalendar from '@/components/ui/vincent-calendar';
-import MobileCalendarSlider from '@/components/ui/mobile-calendar-slider';
 import { getLatestImage, getAllImages } from '@/lib/images';
 import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
@@ -32,17 +31,9 @@ export default async function Home() {
 				</Link>
 			</div>
 
-			{/* Section Calendrier */}
+			{/* Section Calendrier - Version responsive unique */}
 			<section id='calendar' className='w-full max-w-7xl mx-auto'>
-				{/* Version mobile (visible uniquement sur mobile) */}
-				<div className='md:hidden'>
-					<MobileCalendarSlider images={allImages} />
-				</div>
-
-				{/* Version desktop (cachée sur mobile) */}
-				<div className='hidden md:block'>
-					<VincentCalendar images={allImages} />
-				</div>
+				<VincentCalendar images={allImages} />
 			</section>
 
 			{/* Section Galerie */}
