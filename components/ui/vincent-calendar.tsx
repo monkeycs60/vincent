@@ -242,13 +242,13 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 										)}
 									</div>
 
-									{/* Légende à droite sur desktop, en dessous sur mobile - style amélioré */}
+									{/* Légende à droite sur desktop, en dessous sur mobile - style amélioré et centré verticalement */}
 									{image && (
-										<div className='mt-4 md:mt-0 md:max-w-xs text-center md:text-left px-2'>
-											<p className='text-base md:text-lg font-medium italic text-gray-800 mb-2'>
+										<div className='mt-4 md:mt-0 md:max-w-xs md:flex md:flex-col md:justify-center md:h-[480px] text-center md:text-left px-2'>
+											<p className='text-base md:text-xl font-bold italic text-gray-800 mb-2 md:mb-3 leading-snug'>
 												{image.title}
 											</p>
-											<p className='text-xs text-gray-500'>
+											<p className='text-xs md:text-sm text-gray-500'>
 												Généré le{' '}
 												{new Date(image.createdAt)
 													.toLocaleDateString('fr-FR', {
