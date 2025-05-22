@@ -54,7 +54,7 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 			<div className='container mx-auto px-4 relative z-10'>
 				<div className='flex flex-col md:flex-row md:items-center gap-8 md:gap-12 md:mx-auto md:justify-between'>
 					<motion.h1
-						className='text-3xl md:text-4xl md:hidden lg:text-6xl font-extrabold text-left leading-tight bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 text-transparent bg-clip-text'
+						className='text-3xl max-md:text-center md:text-4xl md:hidden lg:text-6xl font-extrabold text-left leading-tight bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 text-transparent bg-clip-text'
 						initial={{ opacity: 0, x: 20 }}
 						animate={{ opacity: 1, x: 0 }}
 						transition={{ duration: 0.7 }}>
@@ -69,14 +69,14 @@ export default function HeroSection({ latestImage }: HeroSectionProps) {
 						whileHover={{ scale: 1.02, rotate: 1 }}
 						whileTap={{ scale: 0.98 }}
 						onClick={openModal}>
-						<div className='relative w-full aspect-[2/3] md:h-[600px] rounded-2xl overflow-hidden border-6 border-white'>
+						<div className='relative w-full max-md:max-w-[280px] mx-auto aspect-[2/3] h-[400px] md:h-[600px] rounded-2xl overflow-hidden border-6 border-white'>
 							<Image
 								src={latestImage.url}
 								alt={latestImage.title}
 								fill
 								className='object-cover'
 								priority
-								sizes='(max-width: 768px) 100vw, 460px'
+								sizes='(max-width: 768px) 280px, 460px'
 							/>
 
 							{/* Badge du jour plus fun et animé */}
