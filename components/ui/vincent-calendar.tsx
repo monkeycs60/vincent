@@ -119,7 +119,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 				}
 			};
 
-			autoplayIntervalRef.current = setInterval(autoplayNext, 5000);
+			autoplayIntervalRef.current = setInterval(autoplayNext, 6000);
 		}
 		return () => {
 			if (autoplayIntervalRef.current) {
@@ -139,6 +139,11 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 		'Dimanche',
 	];
 
+	// Formater le mois en français
+	const formatMonthFr = (date: Date): string => {
+		return date.toLocaleDateString('fr-FR', { month: 'long' });
+	};
+
 	// Variantes d'animation basées sur la direction
 	const variants = {
 		enter: (direction: number) => ({
@@ -157,9 +162,9 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 
 	return (
 		<div className='w-full max-w-4xl mx-auto my-6 md:my-10 px-2'>
-			{/* Titre centré avec style minimaliste */}
-			<h2 className='text-xl md:text-2xl font-semibold text-center mb-4 text-gray-800'>
-				<span className='inline-block border-b border-indigo-300 pb-1'>
+			{/* Titre centré avec style plus élégant */}
+			<h2 className='text-xl md:text-2xl font-semibold text-center mb-8'>
+				<span className='inline-block border-b border-indigo-400 pb-1 px-4'>
 					La semaine de Vincent
 				</span>
 			</h2>
@@ -187,25 +192,27 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 								animate='center'
 								exit='exit'
 								transition={{
-									duration: 0.5,
+									duration: 0.8,
 									ease: 'easeInOut',
 								}}
 								className='absolute w-full'>
-								{/* Informations minimales sur la date */}
-								<div className='text-center mb-3'>
-									<div
-										className={`font-medium text-sm md:text-base ${
-											isToday ? 'text-indigo-600' : 'text-gray-600'
-										}`}>
-										{dayName} {date.getDate()}{' '}
-										{date.toLocaleDateString('fr-FR', {
-											month: 'long',
-										})}
+								{/* Date stylisée et centrée */}
+								<div className='text-center mb-5'>
+									<div className='inline-block mb-1'>
+										<h3
+											className={`font-medium text-base md:text-lg ${
+												isToday
+													? 'text-indigo-600'
+													: 'text-gray-700'
+											}`}>
+											{dayName} {date.getDate()}{' '}
+											{formatMonthFr(date)}
+										</h3>
 									</div>
 								</div>
 
 								{/* Layout flexible pour l'image et la légende */}
-								<div className='flex flex-col md:flex-row md:items-start md:gap-4 md:justify-center'>
+								<div className='flex flex-col md:flex-row md:items-start md:gap-8 md:justify-center'>
 									{/* Image un peu plus haute */}
 									<div
 										className={`
@@ -235,17 +242,21 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 										)}
 									</div>
 
-									{/* Légende à droite sur desktop, en dessous sur mobile */}
+									{/* Légende à droite sur desktop, en dessous sur mobile - style amélioré */}
 									{image && (
-										<div className='mt-2 md:mt-0 md:w-48 text-center md:text-left px-2'>
-											<p className='text-sm md:text-base font-medium italic text-gray-800 mb-1'>
+										<div className='mt-4 md:mt-0 md:max-w-xs text-center md:text-left px-2'>
+											<p className='text-base md:text-lg font-medium italic text-gray-800 mb-2'>
 												{image.title}
 											</p>
 											<p className='text-xs text-gray-500'>
 												Généré le{' '}
-												{new Date(
-													image.createdAt
-												).toLocaleDateString('fr-FR')}
+												{new Date(image.createdAt)
+													.toLocaleDateString('fr-FR', {
+														day: '2-digit',
+														month: '2-digit',
+														year: 'numeric',
+													})
+													.replace(/\//g, '/')}
 											</p>
 										</div>
 									)}
