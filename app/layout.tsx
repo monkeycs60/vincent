@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: 'Vincendrier',
+	title: 'Vincendiary',
 	description: 'Une dose quotidienne de Vincent généré par IA',
 };
 
@@ -43,7 +43,7 @@ export default function RootLayout({
 								/>
 							</div>
 							<span className=' transition-all duration-300'>
-								Vincendrier
+								Vincendiary
 							</span>
 							<Sparkles className='h-5 w-5 text-fuchsia-600 animate-pulse' />
 						</Link>
