@@ -115,11 +115,11 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 			{/* Timeline artistique */}
 			<div className='relative'>
 				{/* Ligne de temps */}
-				<div className='absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-200 via-purple-300 to-pink-200 transform -translate-y-1/2 z-0'></div>
+				<div className='absolute top-[140px] md:top-[140px] left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-200 via-purple-300 to-pink-200 z-0'></div>
 
 				{/* Flèches de navigation (visibles uniquement sur desktop) */}
 				<>
-					<div className='absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-6 z-10'>
+					<div className='absolute left-0 top-[140px] transform -translate-y-1/2 -translate-x-6 z-10'>
 						<motion.button
 							onClick={goToPreviousWeek}
 							className='p-3 rounded-full bg-white shadow-lg text-indigo-600 hover:text-indigo-800 border border-indigo-100'
@@ -129,7 +129,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 						</motion.button>
 					</div>
 
-					<div className='absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-6 z-10'>
+					<div className='absolute right-0 top-[140px] transform -translate-y-1/2 translate-x-6 z-10'>
 						<motion.button
 							onClick={goToNextWeek}
 							className='p-3 rounded-full bg-white shadow-lg text-indigo-600 hover:text-indigo-800 border border-indigo-100'
@@ -143,7 +143,7 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 				{/* Conteneur des jours avec padding pour les flèches (ajustement pour mobile) */}
 				<div
 					ref={timelineRef}
-					className='flex justify-between items-end md:px-10 py-6 overflow-x-auto md:overflow-visible'
+					className='flex justify-between items-start md:px-10 py-6 overflow-x-auto md:overflow-visible'
 					style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
 					<style jsx global>{`
 						/* Cacher la scrollbar pour Chrome, Safari et Opera */
@@ -224,9 +224,9 @@ export default function VincentCalendar({ images }: VincentCalendarProps) {
 								{/* Point sur la timeline */}
 								<div
 									className={`
-									w-3 h-3 rounded-full mt-4
+									w-3 h-3 rounded-full mt-4 relative top-[-14px]
 									${image ? 'bg-indigo-600' : 'bg-gray-300'}
-									${isToday ? 'w-4 h-4 mt-3.5' : ''}
+									${isToday ? 'w-4 h-4' : ''}
 								`}></div>
 							</div>
 						);
