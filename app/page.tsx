@@ -1,7 +1,6 @@
 import React from 'react';
 import HeroSection from '@/components/hero-section';
 import GridGallery from '@/components/ui/grid-gallery';
-import VincentCalendar from '@/components/ui/vincent-calendar';
 import { getLatestImage, getAllImages } from '@/lib/images';
 import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
@@ -30,11 +29,6 @@ export default async function Home() {
 					</span>
 				</Link>
 			</div>
-
-			{/* Section Calendrier - Version responsive unique */}
-			<section id='calendar' className='w-full max-w-7xl mx-auto'>
-				<VincentCalendar images={allImages} />
-			</section>
 
 			{/* Section Galerie */}
 			<section
