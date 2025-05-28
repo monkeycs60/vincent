@@ -2,8 +2,6 @@ import React from 'react';
 import HeroSection from '@/components/hero-section';
 import GridGallery from '@/components/ui/grid-gallery';
 import { getLatestImage, getAllImages } from '@/lib/images';
-import { ChevronDown } from 'lucide-react';
-import Link from 'next/link';
 
 export default async function Home() {
 	// Récupérer la dernière image et toutes les images générées
@@ -14,21 +12,6 @@ export default async function Home() {
 		<main className='flex flex-col items-center min-h-screen '>
 			{/* Hero Section avec la dernière image */}
 			<HeroSection latestImage={latestImage} />
-
-			{/* Flèche de défilement vers le bas */}
-			<div className='w-full flex justify-center mt-10 mb-8 relative z-10'>
-				<Link
-					href='#calendar'
-					scroll={true}
-					className='flex flex-col items-center cursor-pointer transform transition-transform hover:translate-y-1 animate-pulse hover:animate-none'>
-					<div className='w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-indigo-50 border border-indigo-100 mb-2'>
-						<ChevronDown className='text-indigo-600 w-6 h-6' />
-					</div>
-					<span className='text-xs text-indigo-600 font-medium'>
-						Explorer
-					</span>
-				</Link>
-			</div>
 
 			{/* Section Galerie */}
 			<section
