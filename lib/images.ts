@@ -15,7 +15,8 @@ const google = createGoogleGenerativeAI({
 });
 
 const client = new OpenAI({
-	apiKey: process.env.OPEN_AI_API_KEY,
+	apiKey: process.env.GOOGLE_GEMINI_API_KEY,
+	baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
 });
 
 /**
@@ -76,7 +77,7 @@ async function generateCreativeTitle() {
 					},
 				} satisfies GoogleGenerativeAIProviderOptions,
 			},
-			model: google('gemini-2.5-flash-preview-04-17'),
+			model: google('gemini-2.5-flash-lite'),
 			prompt,
 			schema: z.object({
 				title: z.string(),
@@ -140,7 +141,7 @@ export async function generateVincentImage() {
 		console.log('PROMPT COMPLET', prompt);
 
 		const rsp = await client.images.edit({
-			model: 'gpt-image-1',
+			model: 'gemini-2.5-flash-image-preview',
 			image: vincentImageFile,
 			prompt,
 			size: '1024x1536',
