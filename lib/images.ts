@@ -6,17 +6,17 @@ import {
 	GoogleGenerativeAIProviderOptions,
 } from '@ai-sdk/google';
 import { z } from 'zod';
-import OpenAI, { toFile } from 'openai';
 import { Buffer } from 'buffer';
 import sharp from 'sharp';
+import { GoogleGenAI } from '@google/genai';
 
 const google = createGoogleGenerativeAI({
 	apiKey: process.env.GOOGLE_GEMINI_API_KEY,
 });
 
-const client = new OpenAI({
+
+const genAI = new GoogleGenAI({
 	apiKey: process.env.GOOGLE_GEMINI_API_KEY,
-	baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
 });
 
 /**
@@ -114,7 +114,7 @@ export async function generateVincentImage() {
 		dans la situation décrite par le titre et respectant le style graphique suivant: ${graphicalStyle} (en évitant les infractions de copyr). Tu peux trouver une image de référence en pièce-jointe et tu dois t'inspirer de ses traits.`;
 
 		// Générer l'image avec le prompt et l'image de référence
-		console.log("Génération de l'image avec OpenAI...");
+		console.log("Génération de l'image avec Gemini...");
 		const imageStartTime = Date.now();
 
 		// Télécharger l'image de référence depuis l'URL
@@ -132,34 +132,55 @@ export async function generateVincentImage() {
 		}
 
 		const imageBuffer = await response.arrayBuffer();
-		const vincentImageFile = await toFile(
-			new Uint8Array(imageBuffer),
-			'vincent-reference.png',
-			{ type: 'image/png' }
-		);
+		const base64Image = Buffer.from(imageBuffer).toString('base64');
 
 		console.log('PROMPT COMPLET', prompt);
 
-		const rsp = await client.images.edit({
+		// Utiliser l'API Google native pour la retouche d'image
+		const promptWithImage = [
+			{ text: prompt },
+			{
+				inlineData: {
+					mimeType: 'image/jpeg',
+					data: base64Image,
+				},
+			},
+		];
+
+		const rsp = await genAI.models.generateContent({
 			model: 'gemini-2.5-flash-image-preview',
-			image: vincentImageFile,
-			prompt,
-			size: '1024x1536',
+			contents: promptWithImage,
 		});
 
 		console.log(`Image générée en ${Date.now() - imageStartTime}ms`);
+		console.log('rsp', rsp);
+		console.log('rsp.candidates', rsp.candidates);
+		console.log('rsp.candidates[0]', rsp.candidates?.[0]);
+		console.log('rsp.candidates[0].content', rsp.candidates?.[0]?.content);
+		console.log('rsp.candidates[0].content.parts', rsp.candidates?.[0]?.content?.parts);
+		console.log('rsp.candidates[0].content.parts[0]', rsp.candidates?.[0]?.content?.parts?.[0]);
+		console.log('rsp.candidates[0].content.parts[0].inlineData', rsp.candidates?.[0]?.content?.parts?.[0]?.inlineData);
+		console.log('rsp.candidates[0].content.parts[0].inlineData.data', rsp.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data);
+
+		// Extraire l'image générée depuis la réponse Google
+		let originalBuffer: Buffer | null = null;
+		for (const part of rsp.candidates?.[0]?.content?.parts ?? []) {
+			if (part.inlineData) {
+				const imageData = part.inlineData.data;
+				originalBuffer = Buffer.from(imageData ?? '', 'base64');
+				break;
+			}
+		}
+
+		if (!originalBuffer) {
+			throw new Error('Aucune image générée dans la réponse');
+		}
 
 		// Enregistrement dans Vercel Blob
 		console.log(
 			"Compression et enregistrement de l'image dans Vercel Blob..."
 		);
 		const blobStartTime = Date.now();
-
-		// Convertir l'image base64 en buffer
-		const originalBuffer = Buffer.from(
-			rsp.data?.[0]?.b64_json || '',
-			'base64'
-		);
 
 		// Compresser l'image avec Sharp
 		console.log("Compression de l'image avec Sharp...");
